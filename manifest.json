@@ -4,7 +4,7 @@
   "description": "The spaza credit book. See who owes what and remind them on WhatsApp.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#f6f3ec",
-  "theme_color": "#0f5132",
+  "background_color": "#f4f1ea",
+  "theme_color": "#064e36",
   "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
 }

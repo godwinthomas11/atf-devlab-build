@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KasiBook: the spaza credit book</title>
 <meta name="description" content="A credit book for spaza shops. See who owes what and remind them on WhatsApp. Works offline.">
-<meta name="theme-color" content="#0f5132">
+<meta name="theme-color" content="#064e36">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
@@ -161,7 +161,6 @@ input:focus { border-color: var(--green); outline: 0; }
 .head { display: flex; justify-content: space-between; align-items: baseline; }
 
 #toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom)); z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
-#toast[hidden] { display: none; }
 #toast .link { flex: none; color: var(--gold); }
 dialog { width: min(92vw, 440px); margin-top: 16px; padding: 22px; border: 0; border-radius: 22px; box-shadow: 0 30px 80px rgba(0, 0, 0, .35); }
 dialog::backdrop { background: rgba(10, 30, 20, .55); }
