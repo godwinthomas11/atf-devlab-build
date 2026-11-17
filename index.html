@@ -91,6 +91,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 #app > .tabbar { position: fixed; left: 50%; bottom: 0; z-index: 4; flex: none; flex-direction: row; align-items: center; justify-content: space-around; width: min(100%, 480px); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #fff; transform: translateX(-50%); }
 .tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 48px; color: var(--muted); font-size: 12px; font-weight: 600; text-decoration: none; }
 .tabbar a[aria-current="page"] { color: var(--green); }
+#app > .viewswitch { position: fixed; top: 16px; right: 16px; z-index: 4; flex: none; flex-direction: row; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 0; border-radius: 99px; background: #fff; box-shadow: var(--shadow); color: var(--green); font-size: 15px; font-weight: 700; cursor: pointer; }
 .plus { display: grid; place-items: center; width: 54px; height: 54px; margin-top: -20px; border: 4px solid #fff; border-radius: 50%; background: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(8, 123, 77, .35); cursor: pointer; }
 
 .section { display: flex; justify-content: space-between; align-items: baseline; margin: 24px 20px 12px; }
@@ -197,7 +198,7 @@ body.wide { padding: 0; background: var(--bg); }
 .main > .top { position: relative; margin: 0 calc(-1 * var(--gutter)); padding: 28px var(--gutter); border-radius: 0; }
 .main > .top:has(.hero) { padding-bottom: 0; background-repeat: no-repeat; background-size: 100% calc(100% - 52px); }
 .main .topbar { position: absolute; top: 28px; right: var(--gutter); margin: 0; }
-.main .topbar .brand, .main .topbar .me, .main .viewcard, .main .bought { display: none; }
+.main .topbar .brand, .main .topbar .me, .main .bought { display: none; }
 .main .date { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px; border: 1px solid rgba(255, 255, 255, .25); border-radius: 12px; background: rgba(255, 255, 255, .08); font-size: 15px; font-weight: 600; }
 .main .shop, .main .top h1 { font-size: 32px; letter-spacing: -.02em; }
 .main .hero { margin-top: 20px; padding: 22px 28px; border-color: rgba(255, 255, 255, .18); background: linear-gradient(135deg, #075a3d, #0a6e49); box-shadow: 0 14px 30px rgba(6, 78, 54, .28); }
@@ -427,14 +428,15 @@ const bigScreen = matchMedia("(min-width: 900px)");
 let view = bigScreen.matches ? "desktop" : "phone";
 try { view = localStorage.getItem(STORE + "-view") || view; } catch { /* storage blocked: keep the default */ }
 
+function setView(value) {
+  view = value;
+  try { localStorage.setItem(STORE + "-view", value); } catch { /* the choice lasts for this visit only */ }
+  render();
+}
+
 function viewChoice() {
   if (!bigScreen.matches) return null;
-  const choose = (value) => () => {
-    view = value;
-    try { localStorage.setItem(STORE + "-view", value); } catch { /* the choice lasts for this visit only */ }
-    render();
-  };
-  const tab = (value, text) => el("button", { type: "button", class: "tab", "aria-pressed": String(view === value), onclick: choose(value) }, text);
+  const tab = (value, text) => el("button", { type: "button", class: "tab", "aria-pressed": String(view === value), onclick: () => setView(value) }, text);
   return [
     el("p", { class: "ask" }, "How do you want to see KasiBook?"),
     el("div", { class: "tabs" }, tab("phone", "Phone view"), tab("desktop", "Desktop view"))];
@@ -699,7 +701,6 @@ function homeScreen() {
     book.customers.some((customer) => customer.sample) && el("p", { class: "note" },
       "These are sample customers so you can try KasiBook. ",
       el("button", { class: "link", onclick: clearSamples }, "Clear samples")),
-    bigScreen.matches && el("section", { class: "card viewcard" }, viewChoice()),
     el("p", { class: "note", style: "margin-bottom:24px" }, "Saved on this device. Works with no data."));
 }
 
@@ -844,7 +845,9 @@ function render(moved) {
   screen.classList.toggle("main", shell);
   screen.classList.toggle("has-tabs", tabs);
   if (moved) screen.classList.add("enter");
-  $("app").replaceChildren(...(shell ? [sidebar(route)] : []), screen, ...(tabs ? [tabbar(route)] : []));
+  // Phone view on a big screen: every page keeps a way back to the desktop view.
+  const wayBack = tabs && bigScreen.matches && el("button", { class: "viewswitch", onclick: () => setView("desktop") }, icon("left", 18), "Desktop view");
+  $("app").replaceChildren(...(shell ? [sidebar(route)] : []), screen, ...(tabs ? [tabbar(route)] : []), ...(wayBack ? [wayBack] : []));
 }
 
 addEventListener("hashchange", () => {
