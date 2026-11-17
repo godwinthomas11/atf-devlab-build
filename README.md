@@ -25,8 +25,8 @@ This is a large part of everyday trade. About 150,000 spaza shops serve about 11
 
 The home screen greets the owner and asks one question: "What would you like to do?" Four big buttons answer it: **Sold on credit**, **Got paid**, **Who owes me**, **Add a customer**.
 
-1. **Record in two taps.** Choose the customer, tap `+R10`, `+R20`, `+R50` or `+R100`. Or type any amount. Payments work the same way, and every entry can be undone.
-2. **See who owes what.** The total owed is at the top, with a "Follow up first" list of who has owed the longest. Each customer has a label such as "Owing for 46 days" that turns amber after two weeks and red after a month.
+1. **Record in two taps.** Choose the customer, then tap what they bought (Bread, Maize meal, Milk, Airtime, Electricity, Cooking oil) or an amount such as `+R50`. Or type any amount. Payments work the same way, and every entry can be undone. Every customer in a list also has **Credit**, **Paid** and **Remind** buttons, so the common jobs are one tap from the home screen.
+2. **See who owes what.** The total owed is at the top, next to how much is over 30 days old and how much was paid back this week. Below it is a "Follow up first" list of who has owed the longest. Each customer has a label such as "Owing for 46 days" that turns amber after two weeks and red after a month.
 3. **Remind on WhatsApp.** One button opens WhatsApp with a polite message already written, including the balance.
 4. **The customer sees the same book.** The message carries a link to the customer's own statement: every sale, every payment, the balance. Both sides hold the same record, so there is nothing to argue about.
 
@@ -46,6 +46,7 @@ Not sure yet? Tap **Try it with sample customers** on the welcome screen. Tap **
 - **Statements with no server.** A customer's statement is packed into the link itself. Opening the link unpacks it on the customer's phone.
 - **WhatsApp with no API.** Reminders use an ordinary `wa.me` link. Local numbers such as `082 123 4567` are converted to the international format WhatsApp needs.
 - **Money is exact.** Amounts are stored as whole cents, so totals never drift.
+- **Example prices.** The prices on the item buttons are examples for the demo. Every shop charges its own prices, and any amount can be typed.
 
 | File | Job |
 |---|---|
