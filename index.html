@@ -9,37 +9,70 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
-:root { color-scheme: light; --green: #0f5132; --bg: #f6f3ec; --ink: #1c1b18; --muted: #5c5a52; --line: #e4dfd3; --gold: #f4c542; }
+:root { color-scheme: light; --green: #0f5132; --bg: #f4f1ea; --ink: #17231c; --muted: #5b645e; --line: #e7e2d6; --gold: #f4c542; --shadow: 0 1px 2px rgba(23, 35, 28, .06), 0 8px 24px rgba(23, 35, 28, .07); }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-#app { max-width: 520px; min-height: 100vh; margin: 0 auto; padding-bottom: 104px; }
-h1, h2, p { margin: 0; }
-h1 { font-size: 26px; line-height: 1.2; }
+#app { display: flex; flex-direction: column; max-width: 480px; min-height: 100vh; margin: 0 auto; background: var(--bg); }
+#app > * { flex: 1; display: flex; flex-direction: column; }
+h1, h2, p, ol { margin: 0; }
+h1 { font-size: 26px; line-height: 1.2; letter-spacing: -.3px; }
 h2 { font-size: 18px; margin-bottom: 12px; }
 h1, #toast { overflow-wrap: anywhere; }
 button, input { font: inherit; color: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.icon { flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-.top { background: var(--green); color: #fff; padding: 16px 20px 26px; border-radius: 0 0 24px 24px; }
-.top .label { font-size: 16px; opacity: .9; }
-.total { font-size: 46px; font-weight: 800; line-height: 1.15; margin: 2px 0; }
-.shop { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 8px; padding: 0; border: 0; background: none; color: #fff; font-size: 20px; font-weight: 700; cursor: pointer; }
-.back { display: inline-block; padding: 10px 0; color: #fff; font-weight: 600; text-decoration: none; }
-.top .link { color: #fff; padding-left: 0; font-weight: 600; }
-.top .badge { display: inline-block; margin-top: 6px; }
+/* Green header shared by every screen */
+.top { padding: 18px 20px 26px; border-radius: 0 0 28px 28px; color: #fff; background: radial-gradient(circle at 100% 0, rgba(255, 255, 255, .13) 0 130px, transparent 131px), radial-gradient(circle at 0 100%, rgba(255, 255, 255, .07) 0 90px, transparent 91px), linear-gradient(155deg, #0b4229, #0f5132 45%, #1a8553); }
+.top .label { font-size: 16px; opacity: .92; }
+.brand { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; font-size: 16px; font-weight: 700; letter-spacing: .3px; }
+.shop { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0; background: none; color: #fff; font-size: 26px; font-weight: 800; text-align: left; cursor: pointer; }
+.hero { margin-top: 14px; padding: 16px 18px; border: 1px solid rgba(255, 255, 255, .2); border-radius: 20px; background: rgba(255, 255, 255, .12); }
+.total { font-size: 44px; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin: 2px 0 8px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { padding: 3px 12px; border-radius: 99px; background: rgba(255, 255, 255, .2); font-size: 14px; font-weight: 600; }
+.pill.warn { background: #fbd5d0; color: #8a1c12; }
+.back { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-bottom: 4px; color: #fff; font-weight: 600; text-decoration: none; }
+.top .link { padding-left: 0; color: #fff; font-weight: 600; }
+.top .badge { display: inline-block; }
 
-.card, .list { background: #fff; border-radius: 18px; margin: 16px; box-shadow: 0 1px 2px rgba(0, 0, 0, .06); }
+/* Welcome */
+.welcome .top { padding-bottom: 34px; text-align: center; }
+.logo { display: grid; place-items: center; width: 76px; height: 76px; margin: 14px auto 16px; border-radius: 24px; background: #fff; color: var(--green); box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
+.welcome h1 { font-size: 30px; }
+.lead { margin-top: 8px; font-size: 18px; opacity: .95; }
+.steps { list-style: none; margin: -18px 16px 0; padding: 6px 18px; border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.steps li { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
+.steps li + li { border-top: 1px solid var(--line); }
+.steps strong { display: block; line-height: 1.3; }
+.steps small, .tile small { display: block; color: var(--muted); font-size: 14px; line-height: 1.3; }
+.promise { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 16px 20px 0; color: var(--green); font-size: 15px; font-weight: 700; }
+
+/* Home */
+.section { display: flex; justify-content: space-between; align-items: baseline; margin: 24px 20px 12px; }
+.section h2 { margin: 0; }
+.section a { color: var(--green); font-size: 16px; font-weight: 700; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 16px; }
+.tile { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 132px; padding: 16px; border: 0; border-radius: 20px; background: #fff; box-shadow: var(--shadow); color: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.bubble { flex: none; display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 6px; border-radius: 15px; background: #e3f1e8; color: var(--green); }
+.bubble.gold { background: #fdf0c8; color: #7a5600; }
+.bubble.blue { background: #e1ecfb; color: #1d4f91; }
+.bubble.coral { background: #fde4dc; color: #9a3412; }
+
+/* Lists and cards */
+.card, .list { margin: 16px 16px 0; border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.section + .list, .section + .tiles { margin-top: 0; }
 .card { padding: 18px; }
 .note { margin: 16px 20px 0; color: var(--muted); font-size: 16px; }
 .empty { color: var(--muted); }
 .list { list-style: none; padding: 0; overflow: hidden; }
-.list li + li, .history li + li { border-top: 1px solid var(--line); }
-.row { display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 14px 16px; color: inherit; text-decoration: none; }
-.row::after { content: "›"; color: var(--muted); font-size: 24px; }
-.row:active { background: #f3f0e8; }
-.avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #e3efe7; color: var(--green); font-weight: 800; }
+.list li:not([hidden]) + li, .history li + li { border-top: 1px solid var(--line); }
+.row { display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 14px 12px 14px 16px; color: inherit; text-decoration: none; }
+.row:active, .tile:active { background: #f3f0e8; }
+.row > .icon { color: #9aa29c; }
+.avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #e3f1e8; color: var(--green); font-weight: 800; }
 .who { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 .who strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .amt { font-size: 19px; font-weight: 800; white-space: nowrap; }
@@ -47,35 +80,55 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .badge.due { background: #fde9b8; color: #5e4100; }
 .badge.late { background: #fbd5d0; color: #8a1c12; }
 .badge.ok { background: #d7f0df; color: var(--green); }
+.search { position: relative; margin: 16px 16px 0; }
+.search .icon { position: absolute; left: 16px; top: 17px; color: var(--muted); }
+.search input { margin: 0; padding-left: 48px; border-color: transparent; box-shadow: var(--shadow); }
 
+/* Customer */
+.tabs { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 18px; padding: 4px; border-radius: 15px; background: #edeee8; }
+.tab { height: 48px; border: 0; border-radius: 12px; background: none; color: var(--muted); font-weight: 700; cursor: pointer; }
+.tab[aria-pressed="true"] { background: #fff; color: var(--green); box-shadow: 0 1px 3px rgba(0, 0, 0, .14); }
+.tab:disabled { opacity: .5; cursor: default; }
 .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
-.chip { height: 60px; border: 2px solid var(--green); border-radius: 14px; background: #fff; color: var(--green); font-size: 19px; font-weight: 800; cursor: pointer; }
+.chip { height: 60px; border: 2px solid var(--green); border-radius: 15px; background: #fff; color: var(--green); font-size: 19px; font-weight: 800; cursor: pointer; }
 label { display: block; margin-bottom: 6px; font-size: 16px; font-weight: 600; }
-input { width: 100%; height: 56px; margin-bottom: 12px; padding: 0 16px; border: 2px solid #b9b3a4; border-radius: 14px; background: #fff; }
-.btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 56px; padding: 8px 16px; border: 2px solid var(--green); border-radius: 14px; background: #fff; color: var(--green); font-weight: 700; text-align: center; text-decoration: none; cursor: pointer; }
-.btn.primary { background: var(--green); color: #fff; }
-.btn.ghost { margin-top: 10px; border-color: transparent; background: #eef3ee; }
-.btn.whatsapp { width: auto; margin: 0 16px; border-color: #25d366; background: #25d366; color: #06301a; }
-.chip:active, .btn:active { transform: scale(.97); }
+input { width: 100%; height: 56px; margin-bottom: 12px; padding: 0 16px; border: 2px solid #b9b3a4; border-radius: 15px; background: #fff; }
+input:focus { border-color: var(--green); outline: 0; }
+.btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 56px; padding: 8px 16px; border: 2px solid var(--green); border-radius: 15px; background: #fff; color: var(--green); font-weight: 700; text-align: center; text-decoration: none; cursor: pointer; }
+.btn.primary { background: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(15, 81, 50, .25); }
+.btn.ghost { margin-top: 10px; border-color: transparent; background: #eaf2ec; }
+.btn.whatsapp { width: auto; margin: 16px 16px 0; border-color: #25d366; background: #25d366; color: #06301a; box-shadow: 0 6px 16px rgba(37, 211, 102, .3); }
+.chip:active, .btn:active, .tile:active { transform: scale(.97); }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .error { margin-bottom: 10px; color: #a3190d; font-size: 16px; font-weight: 600; }
 .error:empty { display: none; }
 .link { padding: 8px 4px; border: 0; background: none; color: var(--green); font-weight: 700; text-decoration: underline; cursor: pointer; }
-.link.danger { display: block; margin: 8px auto; color: #a3190d; }
+.link.danger { margin: 12px auto 24px; color: #a3190d; }
 .history { list-style: none; margin: 0; padding: 0; }
 .history li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; font-size: 16px; }
-.history .paid { color: #187a4b; }
 .history strong { white-space: nowrap; }
+.history .paid { color: #187a4b; }
 .head { display: flex; justify-content: space-between; align-items: baseline; }
 
-.bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 30%); }
-.bar .btn { max-width: 488px; margin: 0 auto; box-shadow: 0 6px 16px rgba(15, 81, 50, .25); }
-#toast { position: fixed; left: 16px; right: 16px; bottom: 20px; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; max-width: 488px; margin: 0 auto; padding: 10px 16px; border-radius: 14px; background: var(--ink); color: #fff; font-size: 16px; }
+.bar { position: sticky; bottom: 0; margin-top: auto; padding: 28px 16px calc(14px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 40%); }
+#toast { position: fixed; left: 50%; bottom: 20px; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
 #toast[hidden] { display: none; }
 #toast .link { color: var(--gold); }
-dialog { width: min(92vw, 440px); margin-top: 16px; padding: 22px; border: 0; border-radius: 20px; }
-dialog::backdrop { background: rgba(0, 0, 0, .5); }
-@media (prefers-reduced-motion: no-preference) { .chip, .btn { transition: transform .08s; } }
+dialog { width: min(92vw, 440px); margin-top: 16px; padding: 22px; border: 0; border-radius: 22px; box-shadow: 0 30px 80px rgba(0, 0, 0, .35); }
+dialog::backdrop { background: rgba(10, 30, 20, .55); }
+
+/* On a laptop the app sits in the middle like a phone */
+@media (min-width: 600px) {
+  body { padding: 24px 0; background: linear-gradient(160deg, #0f5132, #072a1a) fixed; }
+  #app { min-height: calc(100vh - 48px); border-radius: 32px; box-shadow: 0 30px 80px rgba(0, 0, 0, .4); }
+  .top { border-radius: 32px 32px 28px 28px; }
+  .bar { border-radius: 0 0 32px 32px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chip, .btn, .tile { transition: transform .08s; }
+  .enter { animation: enter .22s ease-out; }
+  @keyframes enter { from { opacity: 0; transform: translateY(10px); } }
+}
 </style>
 </head>
 <body>
@@ -132,6 +185,7 @@ function encodeStatement(shop, customer) {
 
 const clampCents = (n) => Math.max(-MAX_CENTS, Math.min(MAX_CENTS, Math.round(n)));
 
+// A statement link can be edited by anyone, so every field is checked and capped.
 function decodeStatement(text) {
   try {
     const binary = atob(text.replace(/-/g, "+").replace(/_/g, "/"));
@@ -150,6 +204,7 @@ const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2
 
 function sampleBook() {
   const now = Date.now();
+  // Fixed ids, so reloading on a sample customer's page stays on that page.
   const sample = (name, rows) => ({ id: "sample-" + name.split(" ")[0].toLowerCase(), name, phone: "", sample: true, entries: rows.map(([daysAgo, c]) => ({ t: now - daysAgo * DAY, c })) });
   return {
     shop: "Thandi's Spaza",
@@ -161,12 +216,13 @@ function sampleBook() {
   };
 }
 
+// Returns the saved book, or null on a first visit (the welcome screen then starts one).
 function load() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORE));
     if (saved && typeof saved.shop === "string" && Array.isArray(saved.customers)) return saved;
-  } catch { /* unreadable or blocked storage: start with the sample book */ }
-  return sampleBook();
+  } catch { /* unreadable or blocked storage: treat as a first visit */ }
+  return null;
 }
 
 function save() {
@@ -178,6 +234,7 @@ function save() {
 }
 
 let book = load();
+let mode = "sale"; // what the customer screen records: "sale" or "paid"
 
 // ---------- Page building ----------
 
@@ -190,8 +247,33 @@ function el(tag, attrs = {}, ...children) {
     if (name.startsWith("on")) node.addEventListener(name.slice(2), value);
     else if (value !== false && value != null) node.setAttribute(name, value === true ? "" : value);
   }
-  node.append(...children.flat().filter((child) => child != null && child !== false));
+  node.append(...children.flat(Infinity).filter((child) => child != null && child !== false));
   return node;
+}
+
+// Line icons (Feather, MIT licence), drawn inline so the app needs no image files.
+const ICONS = {
+  book: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z",
+  bag: "M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z M3 6h18 M16 10a4 4 0 0 1-8 0",
+  check: "M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4L12 14.01l-3-3",
+  users: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75",
+  userPlus: "M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M8.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M20 8v6 M23 11h-6",
+  chat: "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z",
+  clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 6v6l4 2",
+  phone: "M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z M12 18h.01",
+  search: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.35-4.35",
+  right: "M9 18l6-6-6-6",
+  left: "M19 12H5 M12 19l-7-7 7-7",
+  edit: "M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z",
+};
+
+function icon(name, size = 24) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const path = document.createElementNS(svg.namespaceURI, "path");
+  path.setAttribute("d", ICONS[name]);
+  for (const [attr, value] of Object.entries({ class: "icon", viewBox: "0 0 24 24", width: size, height: size, "aria-hidden": "true" })) svg.setAttribute(attr, value);
+  svg.append(path);
+  return svg;
 }
 
 let toastTimer;
@@ -210,6 +292,15 @@ function ageBadge(customer) {
   const days = daysOwing(customer);
   const text = days < 1 ? "Owing since today" : `Owing for ${days} day${days === 1 ? "" : "s"}`;
   return el("span", { class: "badge" + (days >= 30 ? " late" : days >= 14 ? " due" : "") }, text);
+}
+
+// One customer in a list. Tapping it opens their page, ready for a sale or a payment.
+function customerRow(customer, intent) {
+  return el("li", {}, el("a", { class: "row", href: "#c=" + customer.id, onclick: () => { mode = intent === "paid" ? "paid" : "sale"; } },
+    el("span", { class: "avatar", "aria-hidden": "true" }, [...customer.name][0].toUpperCase()),
+    el("span", { class: "who" }, el("strong", {}, customer.name), ageBadge(customer)),
+    el("span", { class: "amt" }, rand(balance(customer))),
+    icon("right", 20)));
 }
 
 function historyList(entries) {
@@ -233,7 +324,7 @@ function openForm(title, fields, onSave) {
   };
   $("dialog").replaceChildren(el("form", { onsubmit: submit },
     el("h2", {}, title),
-    fields.flatMap((field, i) => [el("label", { for: field.id }, field.label), inputs[i]]),
+    fields.map((field, i) => [el("label", { for: field.id }, field.label), inputs[i]]),
     error,
     el("div", { class: "pair" },
       el("button", { type: "button", class: "btn ghost", style: "margin:0", onclick: () => $("dialog").close() }, "Cancel"),
@@ -242,6 +333,14 @@ function openForm(title, fields, onSave) {
 }
 
 // ---------- Actions ----------
+
+function startBook(shopName, withSamples) {
+  book = withSamples ? sampleBook() : { shop: "My Spaza", customers: [] };
+  if (shopName) book.shop = shopName;
+  save();
+  render(true);
+  scrollTo(0, 0);
+}
 
 function renameShop() {
   openForm("Your shop's name", [{ id: "shop-name", label: "Shop name", value: book.shop, attrs: { maxlength: 40 } }], (name) => {
@@ -252,7 +351,7 @@ function renameShop() {
 }
 
 function customerForm(customer) {
-  openForm(customer ? "Change customer" : "Add customer", [
+  openForm(customer ? "Change customer" : "Add a customer", [
     { id: "customer-name", label: "Name", value: customer?.name, attrs: { maxlength: 40 } },
     { id: "customer-phone", label: "WhatsApp number (optional)", value: customer?.phone, attrs: { inputmode: "tel", placeholder: "082 123 4567" } },
   ], (name, phone) => {
@@ -262,6 +361,7 @@ function customerForm(customer) {
     else {
       const added = { id: newId(), name, phone, entries: [] };
       book.customers.push(added);
+      mode = "sale";
       location.hash = "c=" + added.id;
     }
     save();
@@ -283,7 +383,7 @@ function record(customer, cents, error) {
   });
 }
 
-function undoLast(customer) {
+function removeLast(customer) {
   const removed = customer.entries.pop();
   save();
   render();
@@ -319,66 +419,124 @@ function whatsappLink(customer) {
 
 // ---------- Screens ----------
 
+// First visit: says what KasiBook is, then starts a book in one tap.
+function welcomeScreen() {
+  const shop = el("input", { id: "shop", maxlength: 40, autocomplete: "off", placeholder: "For example Thandi's Spaza" });
+  const step = (iconName, tone, title, text) => el("li", {},
+    el("span", { class: "bubble " + tone }, icon(iconName)),
+    el("span", {}, el("strong", {}, title), el("small", {}, text)));
+  return el("div", { class: "welcome" },
+    el("header", { class: "top" },
+      el("div", { class: "logo" }, icon("book", 40)),
+      el("h1", {}, "Welcome to KasiBook"),
+      el("p", { class: "lead" }, "Your shop's credit book, on your phone. No more lost pages.")),
+    el("ol", { class: "steps" },
+      step("bag", "", "Write it down in two taps", "Tap a customer, tap the amount. KasiBook adds it up."),
+      step("clock", "gold", "See who owes you", "Every balance, and how long it has been owing."),
+      step("chat", "blue", "Remind them on WhatsApp", "One tap sends a polite message with their statement.")),
+    el("p", { class: "promise" }, icon("phone", 18), "Works with no data. No sign-up. Free."),
+    el("form", { class: "card", onsubmit: (event) => { event.preventDefault(); startBook(shop.value.trim(), false); } },
+      el("label", { for: "shop" }, "What is your shop called?"),
+      shop,
+      el("button", { class: "btn primary" }, "Start my book"),
+      el("button", { type: "button", class: "btn ghost", onclick: () => startBook(shop.value.trim(), true) }, "Try it with sample customers")),
+    el("p", { class: "note", style: "text-align:center;margin-bottom:24px" }, "Your book stays on this phone. Nobody else can see it."));
+}
+
 function homeScreen() {
-  const customers = [...book.customers].sort((a, b) => balance(b) - balance(a));
-  const total = customers.reduce((sum, customer) => sum + balance(customer), 0);
-  const owing = customers.filter((customer) => balance(customer) > 0).length;
+  const owing = book.customers.filter((customer) => balance(customer) > 0);
+  const total = owing.reduce((sum, customer) => sum + balance(customer), 0);
+  const late = owing.filter((customer) => daysOwing(customer) >= 30).length;
+  const followUp = [...owing].sort((a, b) => daysOwing(b) - daysOwing(a)).slice(0, 3);
+  const hour = new Date().getHours();
+  const tile = (target, iconName, tone, title, text) =>
+    el(typeof target === "string" ? "a" : "button", typeof target === "string" ? { class: "tile", href: target } : { class: "tile", onclick: target },
+      el("span", { class: "bubble " + tone }, icon(iconName)),
+      el("strong", {}, title),
+      el("small", {}, text));
   return el("div", {},
     el("header", { class: "top" },
-      el("p", { class: "label" }, "KasiBook · your shop's credit book"),
-      el("h1", {}, el("button", { class: "shop", title: "Change shop name", onclick: renameShop }, book.shop, el("span", { "aria-hidden": "true" }, "✎"))),
-      el("p", { class: "label" }, "Total owed to you"),
-      el("p", { class: "total" }, rand(total)),
-      el("p", { class: "label" }, `${owing} of ${customers.length} customers owe you`)),
+      el("div", { class: "brand" }, icon("book", 20), "KasiBook"),
+      el("p", { class: "label" }, `Good ${hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening"}, welcome back`),
+      el("h1", {}, el("button", { class: "shop", title: "Change shop name", onclick: renameShop }, book.shop, icon("edit", 18))),
+      el("div", { class: "hero" },
+        el("p", { class: "label" }, "Customers owe you"),
+        el("p", { class: "total" }, rand(total)),
+        el("p", { class: "pills" },
+          el("span", { class: "pill" }, `${owing.length} of ${book.customers.length} customers owing`),
+          late > 0 && el("span", { class: "pill warn" }, `${late} over 30 days`)))),
+    el("div", { class: "section" }, el("h2", {}, "What would you like to do?")),
+    el("nav", { class: "tiles", "aria-label": "Main actions" },
+      tile("#list=sale", "bag", "", "Sold on credit", "Write a sale in the book"),
+      tile("#list=paid", "check", "gold", "Got paid", "Record a payment"),
+      tile("#list", "users", "blue", "Who owes me", "See all your customers"),
+      tile(() => customerForm(), "userPlus", "coral", "Add a customer", "Put a new name in the book")),
+    followUp.length > 0 && [
+      el("div", { class: "section" }, el("h2", {}, "Follow up first"), el("a", { href: "#list" }, "See all")),
+      el("ul", { class: "list" }, followUp.map((customer) => customerRow(customer)))],
+    book.customers.length === 0 && el("p", { class: "note" }, "Your book is empty. Tap \"Add a customer\" to write your first name in it."),
     book.customers.some((customer) => customer.sample) && el("p", { class: "note" },
       "These are sample customers so you can try KasiBook. ",
       el("button", { class: "link", onclick: clearSamples }, "Clear samples")),
-    customers.length
-      ? el("ul", { class: "list" }, customers.map((customer) =>
-          el("li", {}, el("a", { class: "row", href: "#c=" + customer.id },
-            el("span", { class: "avatar", "aria-hidden": "true" }, [...customer.name][0].toUpperCase()),
-            el("span", { class: "who" }, el("strong", {}, customer.name), ageBadge(customer)),
-            el("span", { class: "amt" }, rand(balance(customer)))))))
-      : el("p", { class: "note" }, "No customers yet. Tap the button below to add your first one."),
-    el("div", { class: "bar" }, el("button", { class: "btn primary", onclick: () => customerForm() }, "+ Add customer")));
+    el("p", { class: "note", style: "margin-bottom:24px" }, "Saved on this phone. Works with no data."));
+}
+
+// The customer list. It also answers "who bought?" and "who paid?" from the home screen.
+function listScreen(intent) {
+  const customers = [...book.customers].sort((a, b) => balance(b) - balance(a));
+  const rows = customers.map((customer) => customerRow(customer, intent));
+  const search = el("input", { id: "search", type: "search", autocomplete: "off", placeholder: "Search by name", "aria-label": "Search customers by name",
+    oninput: () => rows.forEach((row, i) => { row.hidden = !customers[i].name.toLowerCase().includes(search.value.trim().toLowerCase()); }) });
+  return el("div", {},
+    el("header", { class: "top" },
+      el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
+      el("h1", { tabindex: "-1" }, { sale: "Who bought on credit?", paid: "Who paid you?" }[intent] ?? "Who owes you"),
+      el("p", { class: "label", style: "margin-top:6px" }, customers.length ? "Tap a name to open their page." : "No customers in your book yet.")),
+    customers.length > 0 && [el("div", { class: "search" }, icon("search", 20), search), el("ul", { class: "list" }, rows)],
+    el("div", { class: "bar" }, el("button", { class: "btn primary", onclick: () => customerForm() }, icon("userPlus", 20), "Add a new customer")));
 }
 
 function customerScreen(customer) {
   const owed = balance(customer);
+  const paying = mode === "paid" && owed > 0;
+  const sign = paying ? -1 : 1;
   const error = el("p", { class: "error", role: "alert" });
   const amount = el("input", { id: "amount", inputmode: "decimal", autocomplete: "off", placeholder: "For example 35.50" });
-  const typed = (sign) => {
+  const typed = (event) => {
+    event.preventDefault();
     const cents = parseCents(amount.value);
     if (cents) return record(customer, sign * cents, error);
     error.textContent = "Type an amount in rands, for example 35.50";
     amount.focus();
   };
+  const tab = (value, text, disabled) =>
+    el("button", { class: "tab", "aria-pressed": String(paying === (value === "paid")), disabled, onclick: () => { mode = value; render(); } }, text);
   return el("div", {},
     el("header", { class: "top" },
-      el("a", { class: "back", href: "#" }, "‹ All customers"),
+      el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
       el("h1", { tabindex: "-1" }, customer.name),
       el("button", { class: "link", onclick: () => customerForm(customer) }, customer.phone || "Add WhatsApp number"),
-      el("p", { class: "label" }, "Owes you"),
-      el("p", { class: "total" }, rand(owed)),
-      ageBadge(customer)),
+      el("div", { class: "hero" },
+        el("p", { class: "label" }, "Owes you"),
+        el("p", { class: "total" }, rand(owed)),
+        ageBadge(customer))),
     el("section", { class: "card" },
-      el("h2", {}, "Sold on credit? Tap the amount"),
+      el("div", { class: "tabs" }, tab("sale", "Sold on credit"), tab("paid", "Got paid", owed <= 0)),
+      el("h2", {}, paying ? "How much did they pay?" : "How much did they buy?"),
       el("div", { class: "chips" }, [10, 20, 50, 100].map((rands) =>
-        el("button", { class: "chip", onclick: () => record(customer, rands * 100, error) }, "+R" + rands))),
-      el("form", { onsubmit: (event) => { event.preventDefault(); typed(1); } },
+        el("button", { class: "chip", onclick: () => record(customer, sign * rands * 100, error) }, (paying ? "R" : "+R") + rands))),
+      el("form", { onsubmit: typed },
         el("label", { for: "amount" }, "Or type another amount"),
         amount,
         error,
-        el("div", { class: "pair" },
-          el("button", { class: "btn" }, "Add to book"),
-          el("button", { type: "button", class: "btn", onclick: () => typed(-1) }, "Paid amount"))),
-      owed > 0 && el("button", { class: "btn ghost", onclick: () => record(customer, -owed, error) }, `Paid in full (${rand(owed)})`)),
+        el("button", { class: "btn primary" }, paying ? "Record payment" : "Add to book")),
+      paying && el("button", { class: "btn ghost", onclick: () => record(customer, -owed, error) }, `Paid in full (${rand(owed)})`)),
     el("a", { class: "btn whatsapp", href: whatsappLink(customer), target: "_blank", rel: "noopener" },
-      owed > 0 ? "Remind on WhatsApp" : "Send statement on WhatsApp"),
+      icon("chat", 22), owed > 0 ? "Remind on WhatsApp" : "Send statement on WhatsApp"),
     el("section", { class: "card" },
       el("div", { class: "head" },
         el("h2", {}, "History"),
-        customer.entries.length > 0 && el("button", { class: "link", onclick: () => undoLast(customer) }, "Remove last entry")),
+        customer.entries.length > 0 && el("button", { class: "link", onclick: () => removeLast(customer) }, "Remove last entry")),
       historyList(customer.entries)),
     el("button", { class: "link danger", onclick: () => removeCustomer(customer) }, "Delete this customer"));
 }
@@ -386,36 +544,42 @@ function customerScreen(customer) {
 // What a customer sees when they open the link in their WhatsApp message.
 function statementScreen(statement) {
   if (!statement) {
-    return el("section", { class: "card" },
+    return el("div", {}, el("section", { class: "card" },
       el("h1", {}, "This statement did not open"),
-      el("p", { class: "empty" }, "Please ask the shop to send it again."));
+      el("p", { class: "empty", style: "margin-top:8px" }, "Please ask the shop to send it again.")));
   }
   return el("div", {},
     el("header", { class: "top" },
+      el("div", { class: "brand" }, icon("book", 20), "KasiBook"),
       el("p", { class: "label" }, statement.shop),
       el("h1", { tabindex: "-1" }, `Statement for ${statement.name}`),
-      el("p", { class: "label", style: "margin-top:10px" }, statement.balance > 0 ? "You owe" : "You are paid up"),
-      el("p", { class: "total" }, rand(Math.max(0, statement.balance)))),
+      el("div", { class: "hero" },
+        el("p", { class: "label" }, statement.balance > 0 ? "You owe" : "You are paid up"),
+        el("p", { class: "total", style: "margin-bottom:0" }, rand(Math.max(0, statement.balance))))),
     el("section", { class: "card" }, el("h2", {}, "Latest entries"), historyList(statement.entries)),
     el("p", { class: "note" }, "This is a copy of your page in the shop's credit book, from the day it was sent. The shop's own book is the final record. If something looks wrong, speak to the shop owner."),
-    el("p", { class: "note" }, el("a", { href: "#", style: "color:var(--green);font-weight:700" }, "Run a shop? Keep your own book with KasiBook")));
+    el("p", { class: "note", style: "margin-bottom:24px" }, el("a", { href: "#", style: "color:var(--green);font-weight:700" }, "Run a shop? Keep your own book with KasiBook")));
 }
 
-function render() {
+// Pass true when moving to a new screen, so it slides in. Updates in place stay still.
+function render(moved) {
   const route = location.hash.slice(1);
-  const customer = route.startsWith("c=") && book.customers.find((c) => c.id === route.slice(2));
-  $("app").replaceChildren(
-    route.startsWith("s=") ? statementScreen(decodeStatement(route.slice(2)))
+  const customer = book && route.startsWith("c=") && book.customers.find((c) => c.id === route.slice(2));
+  const screen = route.startsWith("s=") ? statementScreen(decodeStatement(route.slice(2)))
+    : !book ? welcomeScreen()
     : customer ? customerScreen(customer)
-    : homeScreen());
+    : route.startsWith("list") ? listScreen(route.slice(5))
+    : homeScreen();
+  if (moved) screen.classList.add("enter");
+  $("app").replaceChildren(screen);
 }
 
 addEventListener("hashchange", () => {
-  render();
+  render(true);
   scrollTo(0, 0);
   document.querySelector("h1")?.focus();
 });
-render();
+render(true);
 
 // Another open tab changed the book: show the newest copy so no tab overwrites the other.
 addEventListener("storage", (event) => {
