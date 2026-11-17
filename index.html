@@ -77,7 +77,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .who { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 .who strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .amt { font-size: 19px; font-weight: 800; white-space: nowrap; }
-.badge { padding: 2px 10px; border-radius: 99px; background: #ece8dd; color: #45423a; font-size: 14px; font-weight: 600; }
+.badge { white-space: nowrap; padding: 2px 10px; border-radius: 99px; background: #ece8dd; color: #45423a; font-size: 14px; font-weight: 600; }
 .badge.due { background: #fde9b8; color: #5e4100; }
 .badge.late { background: #fbd5d0; color: #8a1c12; }
 .badge.ok { background: #d7f0df; color: var(--green); }
@@ -136,6 +136,24 @@ dialog::backdrop { background: rgba(10, 30, 20, .55); }
   .top { border-radius: 32px 32px 28px 28px; }
   .bar { border-radius: 0 0 32px 32px; }
 }
+/* Desktop view: offered on a laptop or office computer, uses the full width */
+.ask { margin-bottom: 6px; font-size: 16px; font-weight: 600; }
+.wide #app { max-width: 1040px; }
+.wide .tiles { grid-template-columns: repeat(4, 1fr); }
+.wide .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 12px; overflow: visible; background: none; box-shadow: none; }
+.wide .list li { border: 0 !important; border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.wide .kpis strong { font-size: 20px; }
+.wide .kpis span { font-size: 15px; }
+.wide .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.wide .steps li + li { border: 0; }
+.wide .welcome .card, .wide .viewcard { width: 100%; max-width: 480px; margin-right: auto; margin-left: auto; }
+.wide .bar .btn { max-width: 448px; margin: 0 auto; }
+.wide #app > .split { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto; }
+.wide .split > .top, .wide .split > .link { grid-column: 1 / -1; justify-self: stretch; }
+.wide .split > .link { justify-self: center; }
+.wide .split > section:first-of-type { grid-row: 2 / span 2; margin-right: 8px; }
+.wide .split > .whatsapp { align-self: start; margin-left: 8px; }
+.wide .split > section:last-of-type { margin-left: 8px; }
 @media (prefers-reduced-motion: no-preference) {
   .chip, .btn, .tile { transition: transform .08s; }
   .enter { animation: enter .22s ease-out; }
@@ -299,6 +317,24 @@ function icon(name, size = 24) {
   for (const [attr, value] of Object.entries({ class: "icon", viewBox: "0 0 24 24", width: size, height: size, "aria-hidden": "true" })) svg.setAttribute(attr, value);
   svg.append(path);
   return svg;
+}
+
+// A laptop or office computer can show the wide desktop view. Phones always get the phone view.
+const bigScreen = matchMedia("(min-width: 900px)");
+let view = bigScreen.matches ? "desktop" : "phone";
+try { view = localStorage.getItem(STORE + "-view") || view; } catch { /* storage blocked: keep the default */ }
+
+function viewChoice() {
+  if (!bigScreen.matches) return null;
+  const choose = (value) => () => {
+    view = value;
+    try { localStorage.setItem(STORE + "-view", value); } catch { /* the choice lasts for this visit only */ }
+    render();
+  };
+  const tab = (value, text) => el("button", { type: "button", class: "tab", "aria-pressed": String(view === value), onclick: choose(value) }, text);
+  return [
+    el("p", { class: "ask" }, "How do you want to see KasiBook?"),
+    el("div", { class: "tabs" }, tab("phone", "Phone view"), tab("desktop", "Desktop view"))];
 }
 
 let toastTimer;
@@ -471,6 +507,7 @@ function welcomeScreen() {
       step("chat", "blue", "Remind them on WhatsApp", "One tap sends a polite message with their statement.")),
     el("p", { class: "promise" }, icon("phone", 18), "Works with no data. No sign-up. Free."),
     el("form", { class: "card", onsubmit: (event) => { event.preventDefault(); startBook(shop.value.trim(), false); } },
+      viewChoice(),
       el("label", { for: "shop" }, "What is your shop called?"),
       shop,
       el("button", { class: "btn primary" }, "Start my book"),
@@ -518,7 +555,8 @@ function homeScreen() {
     book.customers.some((customer) => customer.sample) && el("p", { class: "note" },
       "These are sample customers so you can try KasiBook. ",
       el("button", { class: "link", onclick: clearSamples }, "Clear samples")),
-    el("p", { class: "note", style: "margin-bottom:24px" }, "Saved on this phone. Works with no data."));
+    bigScreen.matches && el("section", { class: "card viewcard" }, viewChoice()),
+    el("p", { class: "note", style: "margin-bottom:24px" }, "Saved on this device. Works with no data."));
 }
 
 // The customer list. It also answers "who bought?" and "who paid?" from the home screen.
@@ -572,7 +610,7 @@ function customerScreen(customer) {
   };
   const tab = (value, text, disabled) =>
     el("button", { class: "tab", "aria-pressed": String(paying === (value === "paid")), disabled, onclick: () => { mode = value; render(); } }, text);
-  return el("div", {},
+  return el("div", { class: "split" },
     el("header", { class: "top" },
       el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
       el("h1", { tabindex: "-1" }, customer.name),
@@ -636,6 +674,7 @@ function render(moved) {
     : customer ? customerScreen(customer)
     : route.startsWith("list") ? listScreen(route.slice(5))
     : homeScreen();
+  document.body.classList.toggle("wide", view === "desktop" && bigScreen.matches);
   if (moved) screen.classList.add("enter");
   $("app").replaceChildren(screen);
 }
@@ -646,6 +685,7 @@ addEventListener("hashchange", () => {
   document.querySelector("h1")?.focus();
 });
 render(true);
+bigScreen.addEventListener("change", () => render());
 
 // Another open tab changed the book: show the newest copy so no tab overwrites the other.
 addEventListener("storage", (event) => {

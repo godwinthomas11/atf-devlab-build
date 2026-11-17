@@ -10,6 +10,10 @@ Built at the Cape Code Hackathon, Africa Tech Festival, Cape Town, 17 November 2
 |---|---|---|---|
 | ![Welcome screen](docs/welcome.png) | ![Home screen](docs/home.png) | ![Customer screen](docs/customer.png) | ![Statement](docs/statement.png) |
 
+On a laptop or office computer, the welcome screen asks "How do you want to see KasiBook?" and offers a **Phone view** or a wider **Desktop view**. The choice can be changed at any time from the home screen.
+
+![Desktop view](docs/desktop.png)
+
 ## The African problem
 
 Spaza shops sell bread, airtime and paraffin to neighbours who pay at month end. Every sale "on the book" goes into a paper notebook.
