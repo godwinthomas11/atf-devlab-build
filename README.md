@@ -27,7 +27,7 @@ This is a large part of everyday trade. About 150,000 spaza shops serve about 11
 
 ## What KasiBook does
 
-The home screen greets the owner and asks one question: "What would you like to do?" Four big buttons answer it: **Sold on credit**, **Got paid**, **Who owes me**, **Add a customer**.
+The home screen greets the owner and asks one question: "What would you like to do?" Four big buttons answer it: **Sold on credit**, **Got paid**, **Who owes me**, **Add a customer**. A bar at the bottom of the phone (a sidebar on a laptop) leads to **Customers**, **Transactions** (every sale and payment, newest first) and **Reminders** (everyone who owes, each with a WhatsApp button).
 
 1. **Record in two taps.** Choose the customer, then tap what they bought (Bread, Maize meal, Milk, Airtime, Electricity, Cooking oil) or an amount such as `+R50`. Or type any amount. Payments work the same way, and every entry can be undone. Every customer in a list also has **Credit**, **Paid** and **Remind** buttons, so the common jobs are one tap from the home screen.
 2. **See who owes what.** The total owed is at the top, next to how much is over 30 days old and how much was paid back this week. Below it is a "Follow up first" list of who has owed the longest. Each customer has a label such as "Owing for 46 days" that turns amber after two weeks and red after a month.

@@ -9,8 +9,9 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
-:root { color-scheme: light; --green: #0f5132; --bg: #f4f1ea; --ink: #17231c; --muted: #5b645e; --line: #e7e2d6; --gold: #f4c542; --shadow: 0 1px 2px rgba(23, 35, 28, .06), 0 8px 24px rgba(23, 35, 28, .07); }
+:root { color-scheme: light; --forest: #064e36; --green: #087b4d; --bg: #f4f1ea; --ink: #17231c; --muted: #5b645e; --line: #e7e2d6; --gold: #f4c542; --shadow: 0 1px 2px rgba(23, 35, 28, .06), 0 8px 24px rgba(23, 35, 28, .07); }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 #app { display: flex; flex-direction: column; max-width: 480px; min-height: 100vh; margin: 0 auto; background: var(--bg); }
@@ -25,16 +26,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .icon { flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* Green header shared by every screen */
-.top { padding: 18px 20px 26px; border-radius: 0 0 28px 28px; color: #fff; background: radial-gradient(circle at 100% 0, rgba(255, 255, 255, .13) 0 130px, transparent 131px), radial-gradient(circle at 0 100%, rgba(255, 255, 255, .07) 0 90px, transparent 91px), linear-gradient(155deg, #0b4229, #0f5132 45%, #1a8553); }
+.top { padding: 18px 20px 26px; border-radius: 0 0 28px 28px; color: #fff; background: radial-gradient(circle at 100% 0, rgba(255, 255, 255, .13) 0 130px, transparent 131px), radial-gradient(circle at 0 100%, rgba(255, 255, 255, .07) 0 90px, transparent 91px), linear-gradient(155deg, #053d2b, #064e36 45%, #0a7a4d); }
 .top .label { font-size: 16px; opacity: .92; }
-.brand { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; font-size: 16px; font-weight: 700; letter-spacing: .3px; }
 .shop { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0; background: none; color: #fff; font-size: 26px; font-weight: 800; text-align: left; cursor: pointer; }
-.hero { margin-top: 14px; padding: 16px 18px; border: 1px solid rgba(255, 255, 255, .2); border-radius: 20px; background: rgba(255, 255, 255, .12); }
 .total { font-size: 44px; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin: 2px 0 8px; }
-.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .22); }
-.kpis strong { display: block; font-size: 16px; white-space: nowrap; }
-.kpis span { display: block; font-size: 13px; line-height: 1.25; opacity: .92; }
-.banner { display: flex; align-items: center; gap: 10px; margin: 16px 16px 0; padding: 12px 16px; border-radius: 16px; background: #fdf0c8; color: #5e4100; font-size: 15px; font-weight: 600; line-height: 1.3; }
 .back { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-bottom: 4px; color: #fff; font-weight: 600; text-decoration: none; }
 .top .link { padding-left: 0; color: #fff; font-weight: 600; }
 .top .badge { display: inline-block; }
@@ -44,39 +39,76 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .logo { display: grid; place-items: center; width: 76px; height: 76px; margin: 14px auto 16px; border-radius: 24px; background: #fff; color: var(--green); box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
 .welcome h1 { font-size: 30px; }
 .lead { margin-top: 8px; font-size: 18px; opacity: .95; }
-.steps { list-style: none; margin: -18px 16px 0; padding: 6px 18px; border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.steps { list-style: none; margin: -18px 16px 0; padding: 6px 18px; border-radius: 18px; background: #fff; box-shadow: var(--shadow); }
 .steps li { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
 .steps li + li { border-top: 1px solid var(--line); }
 .steps strong { display: block; line-height: 1.3; }
 .steps small, .tile small { display: block; color: var(--muted); font-size: 14px; line-height: 1.3; }
+.tile small { font-size: 13px; }
 .promise { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 16px 20px 0; color: var(--green); font-size: 15px; font-weight: 700; }
 
+/* Header band: brand, profile and the money card */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: .2px; }
+.me { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, .3); border-radius: 50%; background: rgba(255, 255, 255, .16); color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; }
+.date { display: none; }
+.hero { margin-top: 14px; padding: 16px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 18px; background: rgba(3, 40, 28, .42); }
+.hero-main { display: flex; align-items: center; gap: 14px; }
+.hero-main .total { margin: 0; font-size: 38px; }
+.coin { flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: rgba(255, 255, 255, .14); }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .18); text-align: center; }
+.kpis p + p { border-left: 1px solid rgba(255, 255, 255, .18); }
+.kpis strong { display: block; font-size: 16px; white-space: nowrap; }
+.kpis span { display: block; font-size: 13px; line-height: 1.25; opacity: .92; }
+.banner { display: flex; align-items: center; gap: 10px; margin: 16px 16px 0; padding: 10px 10px 10px 16px; border-radius: 16px; background: #fff0c7; color: #5e4100; font-size: 15px; font-weight: 600; line-height: 1.3; }
+.banner span { flex: 1; }
+.banner i { display: none; font-style: normal; }
+.send { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border-radius: 12px; background: var(--forest); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+
 /* Home */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px; }
+.tile { display: flex; align-items: center; gap: 10px; min-height: 72px; padding: 12px; border: 0; border-radius: 16px; background: #fff; box-shadow: var(--shadow); color: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.tile .bubble { width: 42px; height: 42px; margin: 0; border-radius: 13px; }
+.tile > span:nth-child(2) { flex: 1; min-width: 0; }
+.tile strong { display: block; font-size: 15px; line-height: 1.25; }
+.tile > .icon { display: none; color: #9aa29c; }
+
+/* A customer in a list. On a phone it is a card; in desktop view the same parts line up as a table row. */
+.cust { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: "av who amt" "av status amt" ". bought bought" "acts acts acts"; column-gap: 14px; align-items: center; padding: 14px 16px; }
+.cust:active { background: #f3f0e8; }
+.cust .avatar { grid-area: av; }
+.cust-link { grid-area: who; overflow: hidden; color: inherit; font-weight: 700; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.cust-link::after { content: ""; position: absolute; inset: 0; } /* the whole card opens the customer */
+.cust .badge { grid-area: status; justify-self: start; margin-top: 4px; }
+.amt { grid-area: amt; font-size: 18px; font-weight: 800; white-space: nowrap; }
+.bought { grid-area: bought; margin-top: 6px; overflow: hidden; color: var(--muted); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.acts { grid-area: acts; position: relative; z-index: 1; display: flex; gap: 8px; margin-top: 10px; }
+.thead, .compact .bought, .compact .acts { display: none; }
+
+/* Phone navigation, fixed to the bottom */
+.has-tabs { padding-bottom: 92px; }
+#app > .tabbar { position: fixed; left: 50%; bottom: 0; z-index: 4; flex: none; flex-direction: row; align-items: center; justify-content: space-around; width: min(100%, 480px); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(255, 255, 255, .95); transform: translateX(-50%); }
+.tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 48px; color: var(--muted); font-size: 12px; font-weight: 600; text-decoration: none; }
+.tabbar a[aria-current="page"] { color: var(--green); }
+.plus { display: grid; place-items: center; width: 54px; height: 54px; margin-top: -20px; border: 4px solid #fff; border-radius: 50%; background: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(8, 123, 77, .35); cursor: pointer; }
+
 .section { display: flex; justify-content: space-between; align-items: baseline; margin: 24px 20px 12px; }
 .section h2 { margin: 0; }
 .section a { color: var(--green); font-size: 16px; font-weight: 700; }
-.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 16px; }
-.tile { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 132px; padding: 16px; border: 0; border-radius: 20px; background: #fff; box-shadow: var(--shadow); color: inherit; text-align: left; text-decoration: none; cursor: pointer; }
 .bubble { flex: none; display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 6px; border-radius: 15px; background: #e3f1e8; color: var(--green); }
 .bubble.gold { background: #fdf0c8; color: #7a5600; }
 .bubble.blue { background: #e1ecfb; color: #1d4f91; }
 .bubble.coral { background: #fde4dc; color: #9a3412; }
 
 /* Lists and cards */
-.card, .list { margin: 16px 16px 0; border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.card, .list { margin: 16px 16px 0; border-radius: 18px; background: #fff; box-shadow: var(--shadow); }
 .section + .list, .section + .tiles { margin-top: 0; }
 .card { padding: 18px; }
 .note { margin: 16px 20px 0; color: var(--muted); font-size: 16px; }
 .empty { color: var(--muted); }
 .list { list-style: none; padding: 0; overflow: hidden; }
-.list li:not([hidden]) + li, .history li + li { border-top: 1px solid var(--line); }
-.row { display: flex; align-items: center; gap: 14px; min-height: 68px; padding: 14px 12px 10px 16px; color: inherit; text-decoration: none; }
-.row:active, .tile:active { background: #f3f0e8; }
-.row > .icon { color: #9aa29c; }
+.list li:not([hidden]):not(.thead) + li, .history li + li { border-top: 1px solid var(--line); }
 .avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #e3f1e8; color: var(--green); font-weight: 800; }
-.who { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
-.who strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.amt { font-size: 19px; font-weight: 800; white-space: nowrap; }
 .badge { white-space: nowrap; padding: 2px 10px; border-radius: 99px; background: #ece8dd; color: #45423a; font-size: 14px; font-weight: 600; }
 .badge.due { background: #fde9b8; color: #5e4100; }
 .badge.late { background: #fbd5d0; color: #8a1c12; }
@@ -87,10 +119,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .filters { display: flex; gap: 8px; margin: 12px 16px 0; padding-bottom: 2px; overflow-x: auto; }
 .filter { flex: none; min-height: 40px; padding: 0 14px; border: 0; border-radius: 99px; background: #fff; box-shadow: var(--shadow); color: var(--muted); font-size: 15px; font-weight: 700; cursor: pointer; }
 .filter[aria-pressed="true"] { background: var(--green); color: #fff; }
-.bought { margin: -8px 16px 0 74px; overflow: hidden; color: var(--muted); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
-.acts { display: flex; gap: 8px; padding: 8px 16px 14px; }
 .act { display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 0 14px; border-radius: 99px; background: #eaf2ec; color: var(--green); font-size: 15px; font-weight: 700; text-decoration: none; white-space: nowrap; }
-.act.wa { background: #25d366; color: #06301a; }
+.act.wa { background: var(--green); color: #fff; }
 .items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
 .item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px; border: 2px solid var(--line); border-radius: 15px; background: #fff; font-size: 14px; font-weight: 700; line-height: 1.25; cursor: pointer; }
 .item span { font-size: 24px; }
@@ -122,8 +152,7 @@ input:focus { border-color: var(--green); outline: 0; }
 .history .paid { color: #187a4b; }
 .head { display: flex; justify-content: space-between; align-items: baseline; }
 
-.bar { position: sticky; bottom: 0; margin-top: auto; padding: 28px 16px calc(14px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 40%); }
-#toast { position: fixed; left: 50%; bottom: 20px; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
+#toast { position: fixed; left: 50%; bottom: 92px; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
 #toast[hidden] { display: none; }
 #toast .link { color: var(--gold); }
 dialog { width: min(92vw, 440px); margin-top: 16px; padding: 22px; border: 0; border-radius: 22px; box-shadow: 0 30px 80px rgba(0, 0, 0, .35); }
@@ -134,68 +163,84 @@ dialog::backdrop { background: rgba(10, 30, 20, .55); }
   body { padding: 24px 0; background: linear-gradient(160deg, #0f5132, #072a1a) fixed; }
   #app { min-height: calc(100vh - 48px); border-radius: 32px; box-shadow: 0 30px 80px rgba(0, 0, 0, .4); }
   .top { border-radius: 32px 32px 28px 28px; }
-  .bar { border-radius: 0 0 32px 32px; }
 }
 /* Desktop view: offered on a laptop or office computer. A sidebar for getting around, the page beside it. */
 .ask { margin-bottom: 6px; font-size: 16px; font-weight: 600; }
 body.wide { padding: 0; background: var(--bg); }
 .wide #app { max-width: none; min-height: 100vh; border-radius: 0; box-shadow: none; }
-.wide #app.shell { display: grid; grid-template-columns: 256px minmax(0, 1fr); align-items: start; background: linear-gradient(90deg, #0d4a2d 256px, var(--bg) 256px); }
+.wide #app.shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: start; background: linear-gradient(90deg, var(--forest) 248px, var(--bg) 248px); }
 .wide #app > :not(.welcome):not(.side):not(.main) { align-self: center; width: 100%; max-width: 480px; }
+.wide #toast { bottom: 24px; }
 
-.side { position: sticky; top: 0; height: 100vh; padding: 28px 16px 20px; background: #0d4a2d; color: #fff; }
-.side .brand { margin: 0 12px 28px; font-size: 20px; }
+.side { position: sticky; top: 0; height: 100vh; padding: 28px 16px 16px; background: var(--forest); color: #fff; }
+.side .brand { margin: 0 12px 32px; font-size: 22px; }
 .side nav { display: flex; flex-direction: column; gap: 4px; }
-.navlink { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 12px; color: rgba(255, 255, 255, .86); font-size: 16px; font-weight: 600; text-decoration: none; }
+.navlink { display: flex; align-items: center; gap: 14px; min-height: 46px; padding: 0 14px; border-radius: 12px; color: rgba(255, 255, 255, .88); font-size: 16px; font-weight: 600; text-decoration: none; }
 .navlink:hover { background: rgba(255, 255, 255, .08); }
-.navlink[aria-current="page"] { background: rgba(255, 255, 255, .16); color: #fff; }
-.side .btn { margin-top: 20px; border-color: #fff; }
-.side-foot { margin-top: auto; padding: 0 4px; color: rgba(255, 255, 255, .8); font-size: 13px; }
+.navlink[aria-current="page"] { background: var(--green); color: #fff; }
+.side-foot { margin-top: auto; color: rgba(255, 255, 255, .8); font-size: 13px; }
 .side-foot .ask { font-size: 13px; }
-.side-foot .tabs { margin-bottom: 14px; background: rgba(0, 0, 0, .28); }
+.side-foot .tabs { margin-bottom: 12px; background: rgba(0, 0, 0, .28); }
 .side-foot .tab { height: 36px; color: rgba(255, 255, 255, .8); font-size: 14px; }
 .side-foot .tab[aria-pressed="true"] { color: var(--green); }
+.profile { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 1px solid rgba(255, 255, 255, .18); border-radius: 14px; background: rgba(255, 255, 255, .06); color: #fff; text-align: left; cursor: pointer; }
+.profile > span:last-child { min-width: 0; }
+.profile strong { display: block; overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.profile small { color: rgba(255, 255, 255, .75); font-size: 13px; }
 
-.main { width: 100%; max-width: 1120px; margin: 0 auto; padding: 8px 24px 48px; }
-.main .top { padding: 24px 16px 0; border-radius: 0; background: none; color: var(--ink); }
-.main .top .brand, .main .bar, .main .viewcard, .main .row > .icon { display: none; }
-.main .top > .label { color: var(--muted); }
-.main .shop, .main .top h1 { color: var(--ink); font-size: 34px; letter-spacing: -.02em; }
-.main .back, .main .top .link { color: var(--green); }
-.main .hero { margin-top: 20px; padding: 24px 28px; border: 0; border-radius: 24px; color: #fff; background: radial-gradient(circle at 100% 0, rgba(255, 255, 255, .13) 0 150px, transparent 151px), linear-gradient(155deg, #0b4229, #0f5132 45%, #1a8553); box-shadow: 0 12px 32px rgba(15, 81, 50, .22); }
-.main .total { font-size: 56px; letter-spacing: -.02em; }
-.main .kpis { padding-top: 16px; }
-.main .kpis strong { font-size: 22px; }
+.main { --gutter: max(32px, calc((100vw - 248px - 1240px) / 2)); padding: 0 var(--gutter) 48px; }
+.main > * { margin-right: 0; margin-left: 0; }
+.main > .top { position: relative; margin: 0 calc(-1 * var(--gutter)); padding: 28px var(--gutter); border-radius: 0; }
+.main > .top:has(.hero) { padding-bottom: 0; background-repeat: no-repeat; background-size: 100% calc(100% - 52px); }
+.main .topbar { position: absolute; top: 28px; right: var(--gutter); margin: 0; }
+.main .topbar .brand, .main .topbar .me, .main .viewcard, .main .bought { display: none; }
+.main .date { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px; border: 1px solid rgba(255, 255, 255, .25); border-radius: 12px; background: rgba(255, 255, 255, .08); font-size: 15px; font-weight: 600; }
+.main .shop, .main .top h1 { font-size: 32px; letter-spacing: -.02em; }
+.main .hero { margin-top: 20px; padding: 22px 28px; border-color: rgba(255, 255, 255, .18); background: linear-gradient(135deg, #075a3d, #0a6e49); box-shadow: 0 14px 30px rgba(6, 78, 54, .28); }
+.main .hero:has(.kpis) { display: flex; align-items: center; gap: 24px; }
+.main .hero-main { flex: 1.3; gap: 20px; }
+.main .hero-main .total { font-size: 46px; letter-spacing: -.02em; }
+.main .coin { width: 72px; height: 72px; border-radius: 20px; }
+.main .kpis { flex: 2; margin: 0; padding: 0; border: 0; }
+.main .kpis p { border-left: 1px solid rgba(255, 255, 255, .18); }
+.main .kpis strong { margin-top: 4px; font-size: 20px; }
 .main .kpis span { font-size: 15px; }
-.main .tiles { grid-template-columns: repeat(4, 1fr); }
-.main .tile { min-height: 0; }
-.main .list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
-.main .acts { grid-column: 2; grid-row: 1; padding: 0 16px 0 8px; }
-.main .bought { grid-column: 1 / -1; grid-row: 2; margin: -6px 16px 12px 74px; }
-.main .row { padding-right: 16px; }
-.wide #app > .main.split { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto; }
+.main .banner { padding: 12px 12px 12px 20px; font-size: 16px; }
+.main .banner i { display: inline; }
+.main .tiles { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.main .tile { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 12px 8px; padding: 18px; }
+.main .tile .bubble { grid-column: 1 / -1; width: 46px; height: 46px; }
+.main .tile > .icon { display: block; align-self: center; }
+.main .tile strong { font-size: 17px; }
+.main .tile small { font-size: 14px; }
+.main .cust, .main .thead { grid-template-columns: 44px minmax(0, 1.5fr) minmax(0, 1fr) 130px 290px; grid-template-areas: "av who status amt acts"; padding: 12px 20px; }
+.main .thead { display: grid; column-gap: 14px; color: var(--muted); font-size: 14px; font-weight: 600; }
+.main .thead span:first-child { grid-column: 1 / span 2; }
+.main .cust .badge, .main .acts { margin: 0; }
+.main .compact .acts { display: flex; }
+.main .whatsapp { margin-right: 0; margin-left: 0; }
+.wide #app > .main.split { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto; column-gap: 20px; }
 .split > .top, .split > .link { grid-column: 1 / -1; }
 .main.split > .link { justify-self: center; }
-.main.split > section:first-of-type { grid-row: 2 / span 2; margin-right: 8px; }
-.main.split > .whatsapp { align-self: start; margin-left: 8px; }
-.main.split > section:last-of-type { margin-left: 8px; }
+.main.split > section:first-of-type { grid-row: 2 / span 2; }
+.main.split > .whatsapp { align-self: start; }
 
-.wide #app > .welcome { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; align-content: center; background: linear-gradient(90deg, #0d4a2d 50%, var(--bg) 50%); }
+.wide #app > .welcome { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; align-content: center; background: linear-gradient(90deg, var(--forest) 50%, var(--bg) 50%); }
 .wide .welcome .top { grid-column: 1; grid-row: 1; padding: 0 64px; border-radius: 0; background: none; text-align: left; }
 .wide .welcome .logo { margin: 0 0 28px; }
 .wide .welcome h1 { font-size: 44px; line-height: 1.08; letter-spacing: -.02em; }
 .wide .welcome .lead { max-width: 24em; font-size: 20px; }
 .wide .welcome .steps { grid-column: 1; grid-row: 2; margin: 32px 64px 0; background: rgba(255, 255, 255, .1); box-shadow: none; color: #fff; }
-.wide .welcome .steps small { color: rgba(255, 255, 255, .86); font-size: 15px; }
 .wide .welcome .steps strong { font-size: 19px; }
+.wide .welcome .steps small { color: rgba(255, 255, 255, .86); font-size: 15px; }
 .wide .welcome .steps li + li { border-color: rgba(255, 255, 255, .18); }
 .wide .welcome .promise { grid-column: 1; grid-row: 3; justify-content: flex-start; margin: 20px 64px 0; color: #fff; }
 .wide .welcome .card { grid-column: 2; grid-row: 1 / span 2; align-self: center; justify-self: center; width: calc(100% - 96px); max-width: 440px; margin: 0; padding: 28px; }
 .wide .welcome .note { grid-column: 2; grid-row: 3; }
 @media (hover: hover) {
-  .row:hover { background: #f8f6f0; }
+  .cust:hover { background: #f8f6f0; }
   .tile:hover { box-shadow: 0 2px 4px rgba(23, 35, 28, .08), 0 14px 32px rgba(23, 35, 28, .12); }
-  .act:hover, .chip:hover, .item:hover { filter: brightness(.96); }
+  .act:hover, .chip:hover, .item:hover, .send:hover { filter: brightness(.95); }
 }
 @media (prefers-reduced-motion: no-preference) {
   .chip, .btn, .tile { transition: transform .08s; }
@@ -348,6 +393,10 @@ const ICONS = {
   right: "M9 18l6-6-6-6",
   left: "M19 12H5 M12 19l-7-7 7-7",
   edit: "M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z",
+  coins: "M12 8c4.97 0 9-1.34 9-3s-4.03-3-9-3-9 1.34-9 3 4.03 3 9 3z M21 12c0 1.66-4 3-9 3s-9-1.34-9-3 M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5",
+  send: "M22 2L11 13 M22 2l-7 20-4-9-9-4 20-7z",
+  repeat: "M17 1l4 4-4 4 M3 11V9a4 4 0 0 1 4-4h14 M7 23l-4-4 4-4 M21 13v2a4 4 0 0 1-4 4H3",
+  plus: "M12 5v14 M5 12h14",
   calendar: "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M16 2v4 M8 2v4 M3 10h18",
 };
 
@@ -381,19 +430,38 @@ function viewChoice() {
     el("div", { class: "tabs" }, tab("phone", "Phone view"), tab("desktop", "Desktop view"))];
 }
 
-// Desktop view only: where you are and where you can go, always in the same place.
+// "Godwin's Spaza" -> "GS", for the round profile badge.
+const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => [...word][0]).join("").toUpperCase();
+
+// Which navigation entry matches the page on screen. A customer's page counts as Customers.
+const currentNav = (route) => (route.startsWith("c=") ? "#list" : "#" + route);
+
+// Desktop view: where you are and where you can go, always in the same place.
 function sidebar(route) {
-  const here = route.startsWith("c=") ? "#list" : "#" + route;
-  const link = (href, iconName, text) => el("a", { class: "navlink", href, "aria-current": here === href && "page" }, icon(iconName, 20), text);
+  const link = (href, iconName, text) => el("a", { class: "navlink", href, "aria-current": currentNav(route) === href && "page" }, icon(iconName, 20), text);
   return el("aside", { class: "side" },
-    el("div", { class: "brand" }, icon("book", 22), "KasiBook"),
+    el("div", { class: "brand" }, icon("book", 26), "KasiBook"),
     el("nav", { "aria-label": "Main" },
-      link("#", "home", "Home"),
+      link("#", "home", "Dashboard"),
       link("#list", "users", "Customers"),
-      link("#list=sale", "bag", "Sold on credit"),
-      link("#list=paid", "check", "Got paid")),
-    el("button", { class: "btn", onclick: () => customerForm() }, icon("userPlus", 20), "Add a customer"),
-    el("div", { class: "side-foot" }, viewChoice(), el("p", {}, "Saved on this device. Works with no data.")));
+      link("#tx", "repeat", "Transactions"),
+      link("#list=remind", "send", "Reminders")),
+    el("div", { class: "side-foot" },
+      viewChoice(),
+      el("button", { class: "profile", title: "Change shop name", onclick: renameShop },
+        el("span", { class: "me" }, initials(book.shop)),
+        el("span", {}, el("strong", {}, book.shop), el("small", {}, "Saved on this device")))));
+}
+
+// Phone view: the same places, within reach of a thumb.
+function tabbar(route) {
+  const tab = (href, iconName, text) => el("a", { href, "aria-current": currentNav(route) === href && "page" }, icon(iconName, 22), text);
+  return el("nav", { class: "tabbar", "aria-label": "Main" },
+    tab("#", "home", "Home"),
+    tab("#list", "users", "Customers"),
+    el("button", { class: "plus", "aria-label": "Add a customer", onclick: () => customerForm() }, icon("plus", 24)),
+    tab("#tx", "repeat", "Transactions"),
+    tab("#list=remind", "send", "Reminders"));
 }
 
 let toastTimer;
@@ -414,24 +482,26 @@ function ageBadge(customer) {
   return el("span", { class: "badge" + (days >= 30 ? " late" : days >= 14 ? " due" : "") }, text);
 }
 
-// One customer in a list: who they are, what they bought, and one-tap actions.
+// One customer in a list: who they are, how long they have owed, how much, and one-tap actions.
 function customerRow(customer, intent) {
   const owed = balance(customer);
   const bought = recentItems(customer);
   const page = "#c=" + customer.id;
   const as = (value) => () => { mode = value; };
-  return el("li", {},
-    el("a", { class: "row", href: page, onclick: as(intent === "paid" ? "paid" : "sale") },
-      el("span", { class: "avatar", "aria-hidden": "true" }, [...customer.name][0].toUpperCase()),
-      el("span", { class: "who" }, el("strong", {}, customer.name), ageBadge(customer)),
-      el("span", { class: "amt" }, rand(owed)),
-      icon("right", 20)),
+  return el("li", { class: "cust" },
+    el("span", { class: "avatar", "aria-hidden": "true" }, [...customer.name][0].toUpperCase()),
+    el("a", { class: "cust-link", href: page, onclick: as(intent === "paid" ? "paid" : "sale") }, customer.name),
+    ageBadge(customer),
+    el("span", { class: "amt" }, rand(owed)),
     bought && el("p", { class: "bought" }, bought),
     el("div", { class: "acts" },
       el("a", { class: "act", href: page, onclick: as("sale"), "aria-label": `Add credit for ${customer.name}` }, "+ Credit"),
-      owed > 0 && el("a", { class: "act", href: page, onclick: as("paid"), "aria-label": `Record a payment from ${customer.name}` }, "✓ Paid"),
+      owed > 0 && el("a", { class: "act", href: page, onclick: as("paid"), "aria-label": `Record a payment from ${customer.name}` }, "\u2713 Paid"),
       owed > 0 && el("a", { class: "act wa", href: whatsappLink(customer), target: "_blank", rel: "noopener", "aria-label": `Remind ${customer.name} on WhatsApp` }, icon("chat", 16), "Remind")));
 }
+
+// Column names for the desktop table. Hidden on a phone, where each customer is a card.
+const tableHead = () => el("li", { class: "thead", "aria-hidden": "true" }, ["Customer", "Status", "Amount", "Actions"].map((text) => el("span", {}, text)));
 
 function historyList(entries) {
   if (!entries.length) return el("p", { class: "empty" }, "Nothing written in the book yet.");
@@ -578,38 +648,43 @@ function homeScreen() {
   const owing = book.customers.filter((customer) => balance(customer) > 0);
   const total = owing.reduce((sum, customer) => sum + balance(customer), 0);
   const overdue = owing.filter((customer) => daysOwing(customer) >= 30).reduce((sum, customer) => sum + balance(customer), 0);
-  const left = daysToMonthEnd();
-  const kpi = (value, label) => el("p", {}, el("strong", {}, value), el("span", {}, label));
   const followUp = [...owing].sort((a, b) => daysOwing(b) - daysOwing(a)).slice(0, 3);
+  const left = daysToMonthEnd();
   const hour = new Date().getHours();
+  const kpi = (iconName, value, label) => el("p", {}, icon(iconName, 20), el("strong", {}, value), el("span", {}, label));
   const tile = (target, iconName, tone, title, text) =>
     el(typeof target === "string" ? "a" : "button", typeof target === "string" ? { class: "tile", href: target } : { class: "tile", onclick: target },
       el("span", { class: "bubble " + tone }, icon(iconName)),
-      el("strong", {}, title),
-      el("small", {}, text));
+      el("span", {}, el("strong", {}, title), el("small", {}, text)),
+      icon("right", 18));
   return el("div", {},
     el("header", { class: "top" },
-      el("div", { class: "brand" }, icon("book", 20), "KasiBook"),
+      el("div", { class: "topbar" },
+        el("div", { class: "brand" }, icon("book", 22), "KasiBook"),
+        el("p", { class: "date" }, icon("calendar", 18), new Date().toLocaleDateString("en-ZA", { weekday: "short", day: "numeric", month: "short", year: "numeric" })),
+        el("button", { class: "me", "aria-label": "Change shop name", onclick: renameShop }, initials(book.shop))),
       el("p", { class: "label" }, `Good ${hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening"}, welcome back`),
       el("h1", {}, el("button", { class: "shop", title: "Change shop name", onclick: renameShop }, book.shop, icon("edit", 18))),
       el("div", { class: "hero" },
-        el("p", { class: "label" }, "Customers owe you"),
-        el("p", { class: "total" }, rand(total)),
+        el("div", { class: "hero-main" },
+          el("span", { class: "coin" }, icon("coins", 28)),
+          el("div", {}, el("p", { class: "label" }, "Customers owe you"), el("p", { class: "total" }, rand(total)))),
         el("div", { class: "kpis" },
-          kpi(`${owing.length} of ${book.customers.length}`, "customers owing"),
-          kpi(rand(overdue), "over 30 days"),
-          kpi(rand(paidSince(book.customers, 7)), "paid this week")))),
+          kpi("users", `${owing.length} of ${book.customers.length}`, "customers owing"),
+          kpi("calendar", rand(overdue), "over 30 days"),
+          kpi("clock", rand(paidSince(book.customers, 7)), "paid this week")))),
     owing.length > 0 && el("p", { class: "banner" }, icon("calendar", 20),
-      `${left ? `Month end is in ${left} day${left === 1 ? "" : "s"}.` : "Today is month end."} A good time to send reminders.`),
+      el("span", {}, left ? `Month end is in ${left} day${left === 1 ? "" : "s"}.` : "Today is month end.", el("i", {}, " A good time to send reminders.")),
+      el("a", { class: "send", href: "#list=remind" }, icon("send", 16), "Send reminders")),
     el("div", { class: "section" }, el("h2", {}, "What would you like to do?")),
     el("nav", { class: "tiles", "aria-label": "Main actions" },
-      tile("#list=sale", "bag", "", "Sold on credit", "Write a sale in the book"),
+      tile("#list=sale", "bag", "", "Sold on credit", "Write a sale"),
       tile("#list=paid", "check", "gold", "Got paid", "Record a payment"),
-      tile("#list", "users", "blue", "Who owes me", "See all your customers"),
-      tile(() => customerForm(), "userPlus", "coral", "Add a customer", "Put a new name in the book")),
+      tile("#list", "users", "blue", "Who owes me", "See all customers"),
+      tile(() => customerForm(), "userPlus", "coral", "Add a customer", "New name in the book")),
     followUp.length > 0 && [
       el("div", { class: "section" }, el("h2", {}, "Follow up first"), el("a", { href: "#list" }, "See all")),
-      el("ul", { class: "list" }, followUp.map((customer) => customerRow(customer)))],
+      el("ul", { class: "list compact" }, tableHead(), followUp.map((customer) => customerRow(customer)))],
     book.customers.length === 0 && el("p", { class: "note" }, "Your book is empty. Tap \"Add a customer\" to write your first name in it."),
     book.customers.some((customer) => customer.sample) && el("p", { class: "note" },
       "These are sample customers so you can try KasiBook. ",
@@ -618,9 +693,9 @@ function homeScreen() {
     el("p", { class: "note", style: "margin-bottom:24px" }, "Saved on this device. Works with no data."));
 }
 
-// The customer list. It also answers "who bought?" and "who paid?" from the home screen.
+// The customer list. It also answers "who bought?", "who paid?" and "who should I remind?".
 function listScreen(intent) {
-  const customers = [...book.customers].sort((a, b) => balance(b) - balance(a));
+  const customers = book.customers.filter((customer) => intent !== "remind" || balance(customer) > 0).sort((a, b) => balance(b) - balance(a));
   const rows = customers.map((customer) => customerRow(customer, intent));
   const monthOf = (t) => new Date(t).getFullYear() * 12 + new Date(t).getMonth();
   const filters = [
@@ -641,17 +716,34 @@ function listScreen(intent) {
     pills.forEach((pill, j) => pill.setAttribute("aria-pressed", String(i === j)));
     show();
   } }, `${label} (${customers.filter(test).length})`));
+  const title = { sale: "Who bought on credit?", paid: "Who paid you?", remind: "Send reminders" }[intent] ?? "Customers";
+  const hint = !customers.length ? (intent === "remind" ? "Nobody owes you right now." : "No customers in your book yet.")
+    : intent === "remind" ? "Tap Remind to open WhatsApp with the message already written." : "Tap a name to open their page.";
   return el("div", {},
     el("header", { class: "top" },
       el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
-      el("h1", { tabindex: "-1" }, { sale: "Who bought on credit?", paid: "Who paid you?" }[intent] ?? "Who owes you"),
-      el("p", { class: "label", style: "margin-top:6px" }, customers.length ? "Tap a name to open their page." : "No customers in your book yet.")),
+      el("h1", { tabindex: "-1" }, title),
+      el("p", { class: "label", style: "margin-top:6px" }, hint)),
     customers.length > 0 && [
       el("div", { class: "search" }, icon("search", 20), search),
       el("div", { class: "filters" }, pills),
-      el("ul", { class: "list" }, rows),
-      none],
-    el("div", { class: "bar" }, el("button", { class: "btn primary", onclick: () => customerForm() }, icon("userPlus", 20), "Add a new customer")));
+      el("ul", { class: "list" }, tableHead(), rows),
+      none]);
+}
+
+// Every sale and payment in the book, newest first.
+function transactionsScreen() {
+  const entries = book.customers.flatMap((customer) => customer.entries.map((entry) => ({ ...entry, customer }))).sort((a, b) => b.t - a.t).slice(0, 100);
+  return el("div", {},
+    el("header", { class: "top" },
+      el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
+      el("h1", { tabindex: "-1" }, "Transactions"),
+      el("p", { class: "label", style: "margin-top:6px" }, "Every sale and payment, newest first.")),
+    el("section", { class: "card" }, entries.length
+      ? el("ul", { class: "history" }, entries.map((entry) => el("li", {},
+          el("span", {}, `${dateText(entry.t)} \u00b7 `, el("a", { href: "#c=" + entry.customer.id, style: "color:var(--green);font-weight:700" }, entry.customer.name), ` \u00b7 ${entry.c > 0 ? entry.n || "Bought on credit" : "Paid"}`),
+          el("strong", { class: entry.c > 0 ? "" : "paid" }, (entry.c > 0 ? "+" : "\u2212") + rand(Math.abs(entry.c))))))
+      : el("p", { class: "empty" }, "Nothing written in the book yet.")));
 }
 
 function customerScreen(customer) {
@@ -731,15 +823,18 @@ function render(moved) {
   const screen = route.startsWith("s=") ? statementScreen(decodeStatement(route.slice(2)))
     : !book ? welcomeScreen()
     : customer ? customerScreen(customer)
+    : route === "tx" ? transactionsScreen()
     : route.startsWith("list") ? listScreen(route.slice(5))
     : homeScreen();
   const wide = view === "desktop" && bigScreen.matches;
   const shell = Boolean(wide && book && !route.startsWith("s="));
   document.body.classList.toggle("wide", wide);
   $("app").classList.toggle("shell", shell);
-  if (shell) screen.classList.add("main");
+  const tabs = Boolean(!wide && book && !route.startsWith("s="));
+  screen.classList.toggle("main", shell);
+  screen.classList.toggle("has-tabs", tabs);
   if (moved) screen.classList.add("enter");
-  $("app").replaceChildren(...(shell ? [sidebar(route)] : []), screen);
+  $("app").replaceChildren(...(shell ? [sidebar(route)] : []), screen, ...(tabs ? [tabbar(route)] : []));
 }
 
 addEventListener("hashchange", () => {
