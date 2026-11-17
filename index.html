@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KasiBook: the spaza credit book</title>
 <meta name="description" content="A credit book for spaza shops. See who owes what and remind them on WhatsApp. Works offline.">
-<meta name="theme-color" content="#0f5132">
+<meta name="theme-color" content="#064e36">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
-:root { color-scheme: light; --green: #0f5132; --bg: #f4f1ea; --ink: #17231c; --muted: #5b645e; --line: #e7e2d6; --gold: #f4c542; --shadow: 0 1px 2px rgba(23, 35, 28, .06), 0 8px 24px rgba(23, 35, 28, .07); }
+:root { color-scheme: light; --forest: #064e36; --green: #087b4d; --bg: #f4f1ea; --ink: #17231c; --muted: #5b645e; --line: #e7e2d6; --gold: #f4c542; --shadow: 0 1px 2px rgba(23, 35, 28, .06), 0 8px 24px rgba(23, 35, 28, .07); }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 #app { display: flex; flex-direction: column; max-width: 480px; min-height: 100vh; margin: 0 auto; background: var(--bg); }
@@ -21,19 +22,15 @@ h2 { font-size: 18px; margin-bottom: 12px; }
 h1, #toast { overflow-wrap: anywhere; }
 button, input { font: inherit; color: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.top :focus-visible, .side :focus-visible { outline-color: var(--gold); }
 .icon { flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* Green header shared by every screen */
-.top { padding: 18px 20px 26px; border-radius: 0 0 28px 28px; color: #fff; background: radial-gradient(circle at 100% 0, rgba(255, 255, 255, .13) 0 130px, transparent 131px), radial-gradient(circle at 0 100%, rgba(255, 255, 255, .07) 0 90px, transparent 91px), linear-gradient(155deg, #0b4229, #0f5132 45%, #1a8553); }
+.top { padding: 18px 20px 26px; border-radius: 0 0 28px 28px; color: #fff; background: radial-gradient(circle at 100% 0, rgba(255, 255, 255, .13) 0 130px, transparent 131px), radial-gradient(circle at 0 100%, rgba(255, 255, 255, .07) 0 90px, transparent 91px), linear-gradient(155deg, #053d2b, #064e36 45%, #0a7a4d); }
 .top .label { font-size: 16px; opacity: .92; }
-.brand { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; font-size: 16px; font-weight: 700; letter-spacing: .3px; }
 .shop { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0; background: none; color: #fff; font-size: 26px; font-weight: 800; text-align: left; cursor: pointer; }
-.hero { margin-top: 14px; padding: 16px 18px; border: 1px solid rgba(255, 255, 255, .2); border-radius: 20px; background: rgba(255, 255, 255, .12); }
 .total { font-size: 44px; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin: 2px 0 8px; }
-.pills { display: flex; flex-wrap: wrap; gap: 8px; }
-.pill { padding: 3px 12px; border-radius: 99px; background: rgba(255, 255, 255, .2); font-size: 14px; font-weight: 600; }
-.pill.warn { background: #fbd5d0; color: #8a1c12; }
 .back { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-bottom: 4px; color: #fff; font-weight: 600; text-decoration: none; }
 .top .link { padding-left: 0; color: #fff; font-weight: 600; }
 .top .badge { display: inline-block; }
@@ -43,46 +40,98 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .logo { display: grid; place-items: center; width: 76px; height: 76px; margin: 14px auto 16px; border-radius: 24px; background: #fff; color: var(--green); box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
 .welcome h1 { font-size: 30px; }
 .lead { margin-top: 8px; font-size: 18px; opacity: .95; }
-.steps { list-style: none; margin: -18px 16px 0; padding: 6px 18px; border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.steps { list-style: none; margin: -18px 16px 0; padding: 6px 18px; border-radius: 18px; background: #fff; box-shadow: var(--shadow); }
 .steps li { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
 .steps li + li { border-top: 1px solid var(--line); }
 .steps strong { display: block; line-height: 1.3; }
 .steps small, .tile small { display: block; color: var(--muted); font-size: 14px; line-height: 1.3; }
+.tile small { font-size: 13px; }
 .promise { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 16px 20px 0; color: var(--green); font-size: 15px; font-weight: 700; }
 
+/* Header band: brand, profile and the money card */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: .2px; }
+.me { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, .3); border-radius: 50%; background: rgba(255, 255, 255, .16); color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; }
+.date { display: none; }
+.hero { margin-top: 14px; padding: 16px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 18px; background: rgba(3, 40, 28, .42); }
+.hero > .kpis:first-child { margin: 0; padding: 0; border: 0; }
+.hero-main { display: flex; align-items: center; gap: 14px; }
+.hero-main .total { margin: 0; font-size: 38px; }
+.coin { flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: rgba(255, 255, 255, .14); }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .18); text-align: center; }
+.kpis p + p { border-left: 1px solid rgba(255, 255, 255, .18); }
+.kpis strong { display: block; font-size: 16px; white-space: nowrap; }
+.kpis span { display: block; font-size: 13px; line-height: 1.25; opacity: .92; }
+.banner { display: flex; align-items: center; gap: 10px; margin: 16px 16px 0; padding: 10px 10px 10px 16px; border-radius: 16px; background: #fff0c7; color: #5e4100; font-size: 15px; font-weight: 600; line-height: 1.3; }
+.banner span { flex: 1; }
+.banner.info { background: #e6f3e9; color: #073d2d; }
+.banner i { display: none; font-style: normal; }
+.send { flex: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border-radius: 12px; background: var(--forest); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+
 /* Home */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px; }
+.tile { display: flex; align-items: center; gap: 8px; min-height: 72px; padding: 10px; border: 0; border-radius: 16px; background: #fff; box-shadow: var(--shadow); color: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.tile .bubble { width: 36px; height: 36px; margin: 0; border-radius: 13px; }
+.tile > span:nth-child(2) { flex: 1; min-width: 0; }
+.tile strong { display: block; font-size: 14px; line-height: 1.25; }
+.tile > .icon { display: none; color: #9aa29c; }
+
+/* A customer in a list. On a phone it is a card; in desktop view the same parts line up as a table row. */
+.cust { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: "av who amt" "av status amt" ". bought bought" "acts acts acts"; column-gap: 14px; align-items: center; padding: 14px 16px; }
+.cust:active { background: #f3f0e8; }
+.cust .avatar { grid-area: av; }
+.cust-link { grid-area: who; overflow: hidden; color: inherit; font-weight: 700; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; }
+.cust-link::after { content: ""; position: absolute; inset: 0; } /* the whole card opens the customer */
+.cust .badge { grid-area: status; justify-self: start; margin-top: 4px; }
+.amt { grid-area: amt; font-size: 18px; font-weight: 800; white-space: nowrap; }
+.bought { grid-area: bought; margin-top: 6px; overflow: hidden; color: var(--muted); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.acts { grid-area: acts; position: relative; z-index: 1; display: flex; gap: 8px; margin-top: 10px; }
+.thead, .compact .bought, .compact .acts { display: none; }
+
+/* Phone navigation, fixed to the bottom */
+.has-tabs { padding-bottom: 92px; }
+#app > .tabbar { position: fixed; left: 50%; bottom: 0; z-index: 4; flex: none; flex-direction: row; align-items: center; justify-content: space-around; width: min(100%, 480px); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #fff; transform: translateX(-50%); }
+.tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 48px; color: var(--muted); font-size: 12px; font-weight: 600; text-decoration: none; }
+.tabbar a[aria-current="page"] { color: var(--green); }
+#app > .viewswitch { position: fixed; top: 16px; right: 16px; z-index: 4; flex: none; flex-direction: row; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 0; border-radius: 99px; background: #fff; box-shadow: var(--shadow); color: var(--green); font-size: 15px; font-weight: 700; cursor: pointer; }
+.plus { display: grid; place-items: center; width: 54px; height: 54px; margin-top: -20px; border: 4px solid #fff; border-radius: 50%; background: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(8, 123, 77, .35); cursor: pointer; }
+
 .section { display: flex; justify-content: space-between; align-items: baseline; margin: 24px 20px 12px; }
 .section h2 { margin: 0; }
-.section a { color: var(--green); font-size: 16px; font-weight: 700; }
-.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 16px; }
-.tile { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 132px; padding: 16px; border: 0; border-radius: 20px; background: #fff; box-shadow: var(--shadow); color: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.section a { margin: -10px 0; padding: 10px 0 10px 12px; color: var(--green); font-size: 16px; font-weight: 700; }
 .bubble { flex: none; display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 6px; border-radius: 15px; background: #e3f1e8; color: var(--green); }
 .bubble.gold { background: #fdf0c8; color: #7a5600; }
 .bubble.blue { background: #e1ecfb; color: #1d4f91; }
 .bubble.coral { background: #fde4dc; color: #9a3412; }
 
 /* Lists and cards */
-.card, .list { margin: 16px 16px 0; border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
+.card, .list { margin: 16px 16px 0; border-radius: 18px; background: #fff; box-shadow: var(--shadow); }
 .section + .list, .section + .tiles { margin-top: 0; }
 .card { padding: 18px; }
+.blank { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 32px 20px; text-align: center; }
+.blank h2 { margin: 0; }
+.blank .btn { width: auto; min-width: 240px; margin-top: 12px; }
 .note { margin: 16px 20px 0; color: var(--muted); font-size: 16px; }
 .empty { color: var(--muted); }
 .list { list-style: none; padding: 0; overflow: hidden; }
-.list li:not([hidden]) + li, .history li + li { border-top: 1px solid var(--line); }
-.row { display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 14px 12px 14px 16px; color: inherit; text-decoration: none; }
-.row:active, .tile:active { background: #f3f0e8; }
-.row > .icon { color: #9aa29c; }
+.list li:not([hidden]):not(.thead) + li, .history li + li { border-top: 1px solid var(--line); }
 .avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #e3f1e8; color: var(--green); font-weight: 800; }
-.who { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
-.who strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.amt { font-size: 19px; font-weight: 800; white-space: nowrap; }
-.badge { padding: 2px 10px; border-radius: 99px; background: #ece8dd; color: #45423a; font-size: 14px; font-weight: 600; }
+.badge { white-space: nowrap; padding: 2px 10px; border-radius: 99px; background: #ece8dd; color: #45423a; font-size: 14px; font-weight: 600; }
 .badge.due { background: #fde9b8; color: #5e4100; }
 .badge.late { background: #fbd5d0; color: #8a1c12; }
 .badge.ok { background: #d7f0df; color: var(--green); }
 .search { position: relative; margin: 16px 16px 0; }
 .search .icon { position: absolute; left: 16px; top: 17px; color: var(--muted); }
 .search input { margin: 0; padding-left: 48px; border-color: transparent; box-shadow: var(--shadow); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 16px 0; }
+.filter { flex: none; min-height: 40px; padding: 0 14px; border: 0; border-radius: 99px; background: #fff; box-shadow: var(--shadow); color: var(--muted); font-size: 15px; font-weight: 700; cursor: pointer; }
+.filter[aria-pressed="true"] { background: var(--green); color: #fff; }
+.act { display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 0 14px; border-radius: 99px; background: #eaf2ec; color: var(--green); font-size: 15px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.act.wa { background: var(--green); color: #fff; }
+.items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+.item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px; border: 2px solid var(--line); border-radius: 15px; background: #fff; font-size: 14px; font-weight: 700; line-height: 1.25; cursor: pointer; }
+.item span { font-size: 24px; }
+.item small { color: var(--muted); font-size: 14px; font-weight: 600; }
 
 /* Customer */
 .tabs { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 18px; padding: 4px; border-radius: 15px; background: #edeee8; }
@@ -98,7 +147,7 @@ input:focus { border-color: var(--green); outline: 0; }
 .btn.primary { background: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(15, 81, 50, .25); }
 .btn.ghost { margin-top: 10px; border-color: transparent; background: #eaf2ec; }
 .btn.whatsapp { width: auto; margin: 16px 16px 0; border-color: #25d366; background: #25d366; color: #06301a; box-shadow: 0 6px 16px rgba(37, 211, 102, .3); }
-.chip:active, .btn:active, .tile:active { transform: scale(.97); }
+.chip:active, .btn:active, .tile:active, .item:active, .act:active { transform: scale(.97); }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .error { margin-bottom: 10px; color: #a3190d; font-size: 16px; font-weight: 600; }
 .error:empty { display: none; }
@@ -107,13 +156,12 @@ input:focus { border-color: var(--green); outline: 0; }
 .history { list-style: none; margin: 0; padding: 0; }
 .history li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; font-size: 16px; }
 .history strong { white-space: nowrap; }
+.history a { padding: 10px 0; }
 .history .paid { color: #187a4b; }
 .head { display: flex; justify-content: space-between; align-items: baseline; }
 
-.bar { position: sticky; bottom: 0; margin-top: auto; padding: 28px 16px calc(14px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 40%); }
-#toast { position: fixed; left: 50%; bottom: 20px; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
-#toast[hidden] { display: none; }
-#toast .link { color: var(--gold); }
+#toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom)); z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
+#toast .link { flex: none; color: var(--gold); }
 dialog { width: min(92vw, 440px); margin-top: 16px; padding: 22px; border: 0; border-radius: 22px; box-shadow: 0 30px 80px rgba(0, 0, 0, .35); }
 dialog::backdrop { background: rgba(10, 30, 20, .55); }
 
@@ -122,7 +170,94 @@ dialog::backdrop { background: rgba(10, 30, 20, .55); }
   body { padding: 24px 0; background: linear-gradient(160deg, #0f5132, #072a1a) fixed; }
   #app { min-height: calc(100vh - 48px); border-radius: 32px; box-shadow: 0 30px 80px rgba(0, 0, 0, .4); }
   .top { border-radius: 32px 32px 28px 28px; }
-  .bar { border-radius: 0 0 32px 32px; }
+  body:not(.wide) { padding-bottom: 0; }
+  body:not(.wide) #app { min-height: calc(100vh - 24px); border-radius: 32px 32px 0 0; }
+}
+/* Desktop view: offered on a laptop or office computer. A sidebar for getting around, the page beside it. */
+.ask { margin-bottom: 6px; font-size: 16px; font-weight: 600; }
+body.wide { padding: 0; background: var(--bg); }
+.wide #app { max-width: none; min-height: 100vh; border-radius: 0; box-shadow: none; }
+.wide #app.shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: start; background: linear-gradient(90deg, var(--forest) 248px, var(--bg) 248px); }
+.wide #app > :not(.welcome):not(.side):not(.main) { align-self: center; width: 100%; max-width: 480px; }
+.wide #toast { bottom: 24px; }
+
+.side { position: sticky; top: 0; height: 100vh; padding: 28px 16px 16px; background: var(--forest); color: #fff; }
+.side .brand { margin: 0 12px 32px; font-size: 22px; }
+.side nav { display: flex; flex-direction: column; gap: 4px; }
+.navlink { display: flex; align-items: center; gap: 14px; min-height: 46px; padding: 0 14px; border-radius: 12px; color: rgba(255, 255, 255, .88); font-size: 16px; font-weight: 600; text-decoration: none; }
+.navlink:hover { background: rgba(255, 255, 255, .08); }
+.navlink[aria-current="page"] { background: var(--green); color: #fff; }
+.side > .btn { margin-top: 20px; border-color: #fff; background: #fff; color: var(--green); box-shadow: none; }
+.side-foot { margin-top: auto; color: rgba(255, 255, 255, .8); font-size: 13px; }
+.side-foot .ask { font-size: 13px; }
+.side-foot .tabs { margin-bottom: 12px; background: rgba(0, 0, 0, .28); }
+.side-foot .tab { height: 36px; color: rgba(255, 255, 255, .8); font-size: 14px; }
+.side-foot .tab[aria-pressed="true"] { color: var(--green); }
+.profile { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 1px solid rgba(255, 255, 255, .18); border-radius: 14px; background: rgba(255, 255, 255, .06); color: #fff; text-align: left; cursor: pointer; }
+.profile > span:last-child { min-width: 0; }
+.profile strong { display: block; overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.profile small { color: rgba(255, 255, 255, .75); font-size: 13px; }
+
+.main { --gutter: max(32px, calc((100vw - 248px - 1240px) / 2)); padding: 0 var(--gutter) 48px; }
+.main > * { margin-right: 0; margin-left: 0; }
+.main > .top { position: relative; margin: 0 calc(-1 * var(--gutter)); padding: 28px var(--gutter); border-radius: 0; }
+.main > .top:has(.hero) { padding-bottom: 0; background-repeat: no-repeat; background-size: 100% calc(100% - 52px); }
+.main .topbar { position: absolute; top: 28px; right: var(--gutter); margin: 0; }
+.main .topbar .brand, .main .topbar .me, .main .bought { display: none; }
+.main .date { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px; border: 1px solid rgba(255, 255, 255, .25); border-radius: 12px; background: rgba(255, 255, 255, .08); font-size: 15px; font-weight: 600; }
+.main .shop, .main .top h1 { font-size: 32px; letter-spacing: -.02em; }
+.main .hero { margin-top: 20px; padding: 22px 28px; border-color: rgba(255, 255, 255, .18); background: linear-gradient(135deg, #075a3d, #0a6e49); box-shadow: 0 14px 30px rgba(6, 78, 54, .28); }
+.main .hero:has(.kpis) { display: flex; align-items: center; gap: 24px; }
+.main .hero-main { flex: 1.3; gap: 20px; }
+.main .hero-main .total { font-size: 46px; letter-spacing: -.02em; }
+.main .coin { width: 72px; height: 72px; border-radius: 20px; }
+.main .kpis { flex: 2; margin: 0; padding: 0; border: 0; }
+.main .kpis p { border-left: 1px solid rgba(255, 255, 255, .18); }
+.main .hero > .kpis:first-child p:first-child { border-left: 0; }
+.main .kpis strong { margin-top: 4px; font-size: 20px; }
+.main .kpis span { font-size: 15px; }
+.main .banner { padding: 12px 12px 12px 20px; font-size: 16px; }
+.main .banner i { display: inline; }
+.main .tiles { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.main .tile { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 12px 8px; padding: 18px; }
+.main .tile .bubble { grid-column: 1 / -1; width: 46px; height: 46px; }
+.main .tile > .icon { display: block; align-self: center; }
+.main .tile strong { font-size: 17px; }
+.main .tile small { font-size: 14px; }
+.main .cust, .main .thead { grid-template-columns: 44px minmax(0, 1.5fr) minmax(0, 1fr) 130px 290px; grid-template-areas: "av who status amt acts"; padding: 12px 20px; }
+.main .thead { display: grid; column-gap: 14px; color: var(--muted); font-size: 14px; font-weight: 600; }
+.main .thead span:first-child { grid-column: 1 / span 2; }
+.main .cust .badge, .main .acts { margin: 0; }
+.main .compact .acts { display: flex; }
+.main .whatsapp { margin-right: 0; margin-left: 0; }
+.wide #app > .main.split { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto; column-gap: 20px; }
+.split > .top, .split > .link { grid-column: 1 / -1; }
+.main.split > .link { justify-self: center; }
+.main.split > section:first-of-type { grid-row: 2 / span 2; }
+.main.split > .whatsapp, .main.split > section:last-of-type { align-self: start; }
+@media (max-width: 1239px) {
+  .main .tiles { grid-template-columns: 1fr 1fr; }
+  .main .cust, .main .thead { grid-template-columns: 44px minmax(0, 1fr) 150px 96px; grid-template-areas: "av who status amt" ". acts acts acts"; }
+  .main .thead span:last-child { display: none; }
+  .main .acts { margin-top: 8px; }
+}
+
+.wide #app > .welcome { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; align-content: center; background: linear-gradient(90deg, var(--forest) 50%, var(--bg) 50%); }
+.wide .welcome .top { grid-column: 1; grid-row: 1; padding: 0 64px; border-radius: 0; background: none; text-align: left; }
+.wide .welcome .logo { margin: 0 0 28px; }
+.wide .welcome h1 { font-size: 44px; line-height: 1.08; letter-spacing: -.02em; }
+.wide .welcome .lead { max-width: 24em; font-size: 20px; }
+.wide .welcome .steps { grid-column: 1; grid-row: 2; margin: 32px 64px 0; background: rgba(255, 255, 255, .1); box-shadow: none; color: #fff; }
+.wide .welcome .steps strong { font-size: 19px; }
+.wide .welcome .steps small { color: rgba(255, 255, 255, .86); font-size: 15px; }
+.wide .welcome .steps li + li { border-color: rgba(255, 255, 255, .18); }
+.wide .welcome .promise { grid-column: 1; grid-row: 3; justify-content: flex-start; margin: 20px 64px 0; color: #fff; }
+.wide .welcome .card { grid-column: 2; grid-row: 1 / span 2; align-self: center; justify-self: center; width: calc(100% - 96px); max-width: 440px; margin: 0; padding: 28px; }
+.wide .welcome .note { grid-column: 2; grid-row: 3; }
+@media (hover: hover) {
+  .cust:hover { background: #f8f6f0; }
+  .tile:hover { box-shadow: 0 2px 4px rgba(23, 35, 28, .08), 0 14px 32px rgba(23, 35, 28, .12); }
+  .act:hover, .chip:hover, .item:hover, .send:hover { filter: brightness(.95); }
 }
 @media (prefers-reduced-motion: no-preference) {
   .chip, .btn, .tile { transition: transform .08s; }
@@ -160,6 +295,25 @@ function waNumber(phone) {
 
 const balance = (customer) => customer.entries.reduce((sum, entry) => sum + entry.c, 0);
 
+// Money paid back by all customers in the last few days.
+const paidSince = (customers, days, now = Date.now()) =>
+  customers.flatMap((customer) => customer.entries).reduce((sum, entry) => sum + (entry.c < 0 && entry.t >= now - days * DAY ? -entry.c : 0), 0);
+
+// The last three named items a customer bought, newest first.
+const recentItems = (customer) => customer.entries.filter((entry) => entry.n).slice(-3).reverse().map((entry) => entry.n).join(" · ");
+
+// A day as "2026-11-17", the format date boxes use, in local time.
+const isoDay = (t = Date.now()) => new Date(t).toLocaleDateString("en-CA");
+
+// "2026-11-03" from a date box -> midday that day. Must be a real date, from 2000 on, and not in the future.
+function parseDay(text, now = Date.now()) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+  const t = m && new Date(+m[1], m[2] - 1, +m[3], 12).getTime();
+  return m && new Date(t).getDate() === +m[3] && +m[1] >= 2000 && t - DAY / 2 <= now ? Math.min(t, now) : null;
+}
+
+const daysToMonthEnd = (now = new Date()) => new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate();
+
 // Payments settle the oldest sales first. Returns the age of the oldest unpaid sale.
 function daysOwing(customer, now = Date.now()) {
   const unpaid = [];
@@ -178,7 +332,7 @@ function daysOwing(customer, now = Date.now()) {
 
 // A statement travels inside the link itself, so no server ever sees it.
 function encodeStatement(shop, customer) {
-  const data = { s: shop, n: customer.name, b: balance(customer), e: customer.entries.slice(-12).map((entry) => [entry.t, entry.c]) };
+  const data = { s: shop, n: customer.name, b: balance(customer), e: customer.entries.slice(-12).map((entry) => (entry.n ? [entry.t, entry.c, entry.n] : [entry.t, entry.c])) };
   const bytes = new TextEncoder().encode(JSON.stringify(data));
   return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
@@ -192,7 +346,7 @@ function decodeStatement(text) {
     const data = JSON.parse(new TextDecoder().decode(Uint8Array.from(binary, (ch) => ch.charCodeAt(0))));
     if (typeof data.s !== "string" || typeof data.n !== "string" || !Number.isFinite(data.b) || !Array.isArray(data.e)) return null;
     const entries = data.e.filter((e) => Array.isArray(e) && Number.isFinite(e[0]) && Number.isFinite(e[1])).slice(0, 12);
-    return { shop: data.s.slice(0, 40), name: data.n.slice(0, 40), balance: clampCents(data.b), entries: entries.map(([t, c]) => ({ t, c: clampCents(c) })) };
+    return { shop: data.s.slice(0, 40), name: data.n.slice(0, 40), balance: clampCents(data.b), entries: entries.map(([t, c, n]) => ({ t, c: clampCents(c), ...(typeof n === "string" && { n: n.slice(0, 20) }) })) };
   } catch {
     return null;
   }
@@ -205,13 +359,13 @@ const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2
 function sampleBook() {
   const now = Date.now();
   // Fixed ids, so reloading on a sample customer's page stays on that page.
-  const sample = (name, rows) => ({ id: "sample-" + name.split(" ")[0].toLowerCase(), name, phone: "", sample: true, entries: rows.map(([daysAgo, c]) => ({ t: now - daysAgo * DAY, c })) });
+  const sample = (name, rows) => ({ id: "sample-" + name.split(" ")[0].toLowerCase(), name, phone: "", sample: true, entries: rows.map(([daysAgo, c, n]) => ({ t: now - daysAgo * DAY, c, ...(n && { n }) })) });
   return {
     shop: "Thandi's Spaza",
     customers: [
-      sample("Nomsa Khumalo", [[9, 12000], [5, 8500], [2, -2000]]),
-      sample("Tshepo Mokoena", [[46, 25000], [30, 9000]]),
-      sample("Sibusiso Dlamini", [[18, 9500]]),
+      sample("Nomsa Khumalo", [[9, 12000, "Maize meal and oil"], [5, 8500, "Electricity"], [2, -2000]]),
+      sample("Tshepo Mokoena", [[46, 25000, "Groceries"], [30, 9000, "Airtime and bread"]]),
+      sample("Sibusiso Dlamini", [[18, 9500, "Paraffin"]]),
     ],
   };
 }
@@ -223,6 +377,21 @@ function load() {
     if (saved && typeof saved.shop === "string" && Array.isArray(saved.customers)) return saved;
   } catch { /* unreadable or blocked storage: treat as a first visit */ }
   return null;
+}
+
+// A backup file comes from outside the app, so every field is checked and capped, like a statement link.
+function checkBook(data) {
+  if (!data || typeof data.shop !== "string" || !Array.isArray(data.customers)) return null;
+  const ids = new Set();
+  const customers = data.customers.filter((c) => c && typeof c.name === "string" && c.name.trim() && Array.isArray(c.entries)).map((c) => {
+    const id = typeof c.id === "string" && c.id && !ids.has(c.id) ? c.id.slice(0, 40) : newId();
+    ids.add(id);
+    return { id, name: c.name.slice(0, 40), phone: typeof c.phone === "string" ? c.phone.slice(0, 20) : "", ...(c.sample === true && { sample: true }),
+      entries: c.entries.filter((e) => e && Number.isFinite(e.t) && Number.isInteger(e.c) && e.c !== 0)
+        .map((e) => ({ t: e.t, c: clampCents(e.c), ...(typeof e.n === "string" && e.n && { n: e.n.slice(0, 40) }) })) };
+  });
+  const prices = ITEMS.filter(([, name]) => Number.isInteger(data.prices?.[name]) && data.prices[name] > 0 && data.prices[name] <= MAX_CENTS);
+  return { shop: data.shop.slice(0, 40) || "My Spaza", customers, ...(prices.length && { prices: Object.fromEntries(prices.map(([, name]) => [name, data.prices[name]])) }) };
 }
 
 function save() {
@@ -253,6 +422,7 @@ function el(tag, attrs = {}, ...children) {
 
 // Line icons (Feather, MIT licence), drawn inline so the app needs no image files.
 const ICONS = {
+  home: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10",
   book: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z",
   bag: "M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z M3 6h18 M16 10a4 4 0 0 1-8 0",
   check: "M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4L12 14.01l-3-3",
@@ -265,7 +435,17 @@ const ICONS = {
   right: "M9 18l6-6-6-6",
   left: "M19 12H5 M12 19l-7-7 7-7",
   edit: "M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z",
+  coins: "M12 8c4.97 0 9-1.34 9-3s-4.03-3-9-3-9 1.34-9 3 4.03 3 9 3z M21 12c0 1.66-4 3-9 3s-9-1.34-9-3 M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5",
+  send: "M22 2L11 13 M22 2l-7 20-4-9-9-4 20-7z",
+  repeat: "M17 1l4 4-4 4 M3 11V9a4 4 0 0 1 4-4h14 M7 23l-4-4 4-4 M21 13v2a4 4 0 0 1-4 4H3",
+  plus: "M12 5v14 M5 12h14",
+  calendar: "M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M16 2v4 M8 2v4 M3 10h18",
 };
+
+// One-tap items. The prices are examples only: every shop sets its own, and any amount can be typed.
+const ITEMS = [["🍞", "Bread", 1800], ["🌽", "Maize meal", 4200], ["🥛", "Milk", 3400], ["📱", "Airtime", 2000], ["⚡", "Electricity", 5000], ["🛢️", "Cooking oil", 3800]];
+// The shop's own price for an item, or the example price until it sets one.
+const price = (name, cents) => book.prices?.[name] ?? cents;
 
 function icon(name, size = 24) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -274,6 +454,60 @@ function icon(name, size = 24) {
   for (const [attr, value] of Object.entries({ class: "icon", viewBox: "0 0 24 24", width: size, height: size, "aria-hidden": "true" })) svg.setAttribute(attr, value);
   svg.append(path);
   return svg;
+}
+
+// A laptop or office computer can show the wide desktop view. Phones always get the phone view.
+const bigScreen = matchMedia("(min-width: 900px)");
+let view = bigScreen.matches ? "desktop" : "phone";
+try { view = localStorage.getItem(STORE + "-view") || view; } catch { /* storage blocked: keep the default */ }
+
+function setView(value) {
+  view = value;
+  try { localStorage.setItem(STORE + "-view", value); } catch { /* the choice lasts for this visit only */ }
+  render();
+}
+
+function viewChoice() {
+  if (!bigScreen.matches) return null;
+  const tab = (value, text) => el("button", { type: "button", class: "tab", "aria-pressed": String(view === value), onclick: () => setView(value) }, text);
+  return [
+    el("p", { class: "ask" }, "How do you want to see KasiBook?"),
+    el("div", { class: "tabs" }, tab("phone", "Phone view"), tab("desktop", "Desktop view"))];
+}
+
+// "Godwin's Spaza" -> "GS", for the round profile badge.
+const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => [...word][0]).join("").toUpperCase();
+
+// Which navigation entry matches the page on screen. A customer's page and the two "who?" pages count as Customers.
+const currentNav = (route) => (route.startsWith("c=") || route === "list=sale" || route === "list=paid" ? "#list" : "#" + route);
+
+// Desktop view: where you are and where you can go, always in the same place.
+function sidebar(route) {
+  const link = (href, iconName, text) => el("a", { class: "navlink", href, "aria-current": currentNav(route) === href && "page" }, icon(iconName, 20), text);
+  return el("aside", { class: "side" },
+    el("div", { class: "brand" }, icon("book", 26), "KasiBook"),
+    el("nav", { "aria-label": "Main" },
+      link("#", "home", "Dashboard"),
+      link("#list", "users", "Customers"),
+      link("#tx", "repeat", "Transactions"),
+      link("#list=remind", "send", "Reminders")),
+    addButton(),
+    el("div", { class: "side-foot" },
+      viewChoice(),
+      el("button", { class: "profile", title: "Change shop name", onclick: renameShop },
+        el("span", { class: "me" }, initials(book.shop)),
+        el("span", {}, el("strong", {}, book.shop), el("small", {}, "Saved on this device")))));
+}
+
+// Phone view: the same places, within reach of a thumb.
+function tabbar(route) {
+  const tab = (href, iconName, text) => el("a", { href, "aria-current": currentNav(route) === href && "page" }, icon(iconName, 22), text);
+  return el("nav", { class: "tabbar", "aria-label": "Main" },
+    tab("#", "home", "Home"),
+    tab("#list", "users", "Customers"),
+    el("button", { class: "plus", "aria-label": "Add a customer", onclick: () => customerForm() }, icon("plus", 24)),
+    tab("#tx", "repeat", "Transactions"),
+    tab("#list=remind", "send", "Reminders"));
 }
 
 let toastTimer;
@@ -285,6 +519,9 @@ function toast(text, undo) {
   toastTimer = setTimeout(() => { box.hidden = true; }, 7000);
 }
 
+// One of the small numbers in the green money card.
+const kpi = (iconName, value, label) => el("p", {}, icon(iconName, 20), el("strong", {}, value), el("span", {}, label));
+
 const dateText = (t) => new Date(t).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" });
 
 function ageBadge(customer) {
@@ -294,22 +531,41 @@ function ageBadge(customer) {
   return el("span", { class: "badge" + (days >= 30 ? " late" : days >= 14 ? " due" : "") }, text);
 }
 
-// One customer in a list. Tapping it opens their page, ready for a sale or a payment.
+// One customer in a list: who they are, how long they have owed, how much, and one-tap actions.
 function customerRow(customer, intent) {
-  return el("li", {}, el("a", { class: "row", href: "#c=" + customer.id, onclick: () => { mode = intent === "paid" ? "paid" : "sale"; } },
+  const owed = balance(customer);
+  const bought = recentItems(customer);
+  const page = "#c=" + customer.id;
+  const as = (value) => () => { mode = value; };
+  return el("li", { class: "cust" },
     el("span", { class: "avatar", "aria-hidden": "true" }, [...customer.name][0].toUpperCase()),
-    el("span", { class: "who" }, el("strong", {}, customer.name), ageBadge(customer)),
-    el("span", { class: "amt" }, rand(balance(customer))),
-    icon("right", 20)));
+    el("a", { class: "cust-link", href: page, onclick: as(intent === "paid" ? "paid" : "sale") }, customer.name),
+    ageBadge(customer),
+    el("span", { class: "amt" }, rand(owed)),
+    bought && el("p", { class: "bought" }, bought),
+    el("div", { class: "acts" },
+      el("a", { class: "act", href: page, onclick: as("sale"), "aria-label": `Add credit for ${customer.name}` }, "+ Credit"),
+      owed > 0 && el("a", { class: "act", href: page, onclick: as("paid"), "aria-label": `Record a payment from ${customer.name}` }, "\u2713 Paid"),
+      owed > 0 && el("a", { class: "act wa", href: whatsappLink(customer), target: "_blank", rel: "noopener", "aria-label": `Remind ${customer.name} on WhatsApp` }, icon("chat", 16), "Remind")));
 }
+
+// Column names for the desktop table. Hidden on a phone, where each customer is a card.
+const tableHead = () => el("li", { class: "thead", "aria-hidden": "true" }, ["Customer", "Status", "Amount", "Actions"].map((text) => el("span", {}, text)));
 
 function historyList(entries) {
   if (!entries.length) return el("p", { class: "empty" }, "Nothing written in the book yet.");
   return el("ul", { class: "history" }, [...entries].reverse().map((entry) =>
     el("li", {},
-      el("span", {}, `${dateText(entry.t)} · ${entry.c > 0 ? "Bought on credit" : "Paid"}`),
+      el("span", {}, `${dateText(entry.t)} · ${entry.c > 0 ? entry.n || "Bought on credit" : "Paid"}`),
       el("strong", { class: entry.c > 0 ? "" : "paid" }, (entry.c > 0 ? "+" : "−") + rand(Math.abs(entry.c))))));
 }
+
+// Nothing to show yet: say so in plain words and offer the one thing to do next. No page is a dead end.
+const emptyState = (title, text, action) => el("section", { class: "card blank" },
+  el("span", { class: "bubble" }, icon("users", 26)), el("h2", {}, title), el("p", { class: "empty" }, text), action);
+const addButton = (text = "Add a customer") => el("button", { class: "btn primary", onclick: () => customerForm() }, icon("userPlus", 20), text);
+const noCustomers = () => emptyState("No customers yet", "Add your first customer's name. It takes a few seconds.", addButton());
+const nothingYet = (title, text) => emptyState(title, text, el("a", { class: "btn primary", href: "#list=sale" }, icon("bag", 20), "Record a sale"));
 
 // A pop-up form. onSave returns a problem to show, or nothing when all is well.
 function openForm(title, fields, onSave) {
@@ -354,12 +610,20 @@ function customerForm(customer) {
   openForm(customer ? "Change customer" : "Add a customer", [
     { id: "customer-name", label: "Name", value: customer?.name, attrs: { maxlength: 40 } },
     { id: "customer-phone", label: "WhatsApp number (optional)", value: customer?.phone, attrs: { inputmode: "tel", placeholder: "082 123 4567" } },
-  ], (name, phone) => {
+    // A new customer may already owe money in the paper book. Only asked when adding.
+    ...(customer ? [] : [
+      { id: "customer-owes", label: "Already owes you? (from your paper book)", attrs: { inputmode: "decimal", placeholder: "For example 300" } },
+      { id: "customer-since", label: "Owing since", value: isoDay(), attrs: { type: "date", max: isoDay() } }]),
+  ], (name, phone, owes, since) => {
     if (!name) return "Please type the customer's name.";
     if (phone && !waNumber(phone)) return "Use a South African cell number, like 082 123 4567.";
+    const opening = owes ? parseCents(owes) : 0;
+    if (opening === null) return "Type what they already owe in rands, for example 300.";
+    const t = opening && parseDay(since);
+    if (opening && !t) return "Pick the day they started owing. It cannot be in the future.";
     if (customer) Object.assign(customer, { name, phone, sample: false });
     else {
-      const added = { id: newId(), name, phone, entries: [] };
+      const added = { id: newId(), name, phone, entries: opening ? [{ t, c: opening, n: "From paper book" }] : [] };
       book.customers.push(added);
       mode = "sale";
       location.hash = "c=" + added.id;
@@ -368,15 +632,50 @@ function customerForm(customer) {
   });
 }
 
-function record(customer, cents, error) {
+function priceForm() {
+  openForm("Your prices", ITEMS.map(([emoji, name, cents], i) => ({ id: "price-" + i, label: `${emoji} ${name} (rands)`, value: String(price(name, cents) / 100), attrs: { inputmode: "decimal" } })), (...values) => {
+    const cents = values.map(parseCents);
+    const bad = cents.indexOf(null);
+    if (bad >= 0) return `Type a price for ${ITEMS[bad][1]}, for example 18.50`;
+    book.prices = Object.fromEntries(ITEMS.map(([, name], i) => [name, cents[i]]));
+    save();
+  });
+}
+
+function downloadBackup() {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(book)], { type: "application/json" }));
+  el("a", { href: url, download: `kasibook-backup-${isoDay()}.json` }).click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("Backup saved in your Downloads. Send it to yourself on WhatsApp to keep it safe.");
+}
+
+// A hidden file box, kept on the page so every browser lets a button open it.
+const backupPicker = () => {
+  const file = el("input", { type: "file", accept: ".json,application/json", hidden: true, onchange: () => file.files[0] && loadBackup(file.files[0]) });
+  return file;
+};
+
+async function loadBackup(file) {
+  let loaded = null;
+  try { if (file.size < 5e6) loaded = checkBook(JSON.parse(await file.text())); } catch { /* not a JSON file: said below */ }
+  if (!loaded) return toast("That file is not a KasiBook backup.");
+  if (book && !confirm(`Replace the book on this device with the backup of ${loaded.shop} (${loaded.customers.length} customers)?`)) return;
+  const before = book;
+  book = loaded;
+  save();
+  render();
+  toast("Backup loaded", () => { book = before; save(); render(); });
+}
+
+function record(customer, cents, error, item) {
   const owed = balance(customer);
   if (cents < 0 && -cents > owed) { error.textContent = `${customer.name} only owes ${rand(owed)}.`; return; }
   if (owed + cents > MAX_CENTS) { error.textContent = `One customer can owe at most ${rand(MAX_CENTS)}.`; return; }
-  const entry = { t: Date.now(), c: cents };
+  const entry = { t: Date.now(), c: cents, ...(item && { n: item }) };
   customer.entries.push(entry);
   save();
   render();
-  toast(cents > 0 ? `Added ${rand(cents)} to ${customer.name}` : `${customer.name} paid ${rand(-cents)}`, () => {
+  toast(cents > 0 ? `Added ${item ? item + " " : ""}${rand(cents)} to ${customer.name}` : `${customer.name} paid ${rand(-cents)}`, () => {
     customer.entries.splice(customer.entries.indexOf(entry), 1);
     save();
     render();
@@ -422,6 +721,7 @@ function whatsappLink(customer) {
 // First visit: says what KasiBook is, then starts a book in one tap.
 function welcomeScreen() {
   const shop = el("input", { id: "shop", maxlength: 40, autocomplete: "off", placeholder: "For example Thandi's Spaza" });
+  const file = backupPicker();
   const step = (iconName, tone, title, text) => el("li", {},
     el("span", { class: "bubble " + tone }, icon(iconName)),
     el("span", {}, el("strong", {}, title), el("small", {}, text)));
@@ -435,65 +735,131 @@ function welcomeScreen() {
       step("clock", "gold", "See who owes you", "Every balance, and how long it has been owing."),
       step("chat", "blue", "Remind them on WhatsApp", "One tap sends a polite message with their statement.")),
     el("p", { class: "promise" }, icon("phone", 18), "Works with no data. No sign-up. Free."),
-    el("form", { class: "card", onsubmit: (event) => { event.preventDefault(); startBook(shop.value.trim(), false); } },
+    el("form", { class: "card", onsubmit: (event) => { event.preventDefault(); startBook(shop.value.trim(), true); } },
+      viewChoice(),
       el("label", { for: "shop" }, "What is your shop called?"),
       shop,
-      el("button", { class: "btn primary" }, "Start my book"),
-      el("button", { type: "button", class: "btn ghost", onclick: () => startBook(shop.value.trim(), true) }, "Try it with sample customers")),
-    el("p", { class: "note", style: "text-align:center;margin-bottom:24px" }, "Your book stays on this phone. Nobody else can see it."));
+      el("button", { class: "btn primary" }, "Start my book with sample customers"),
+      el("button", { type: "button", class: "btn ghost", onclick: () => startBook(shop.value.trim(), false) }, "Start with an empty book"),
+      el("button", { type: "button", class: "link", style: "display:block;margin:10px auto 0", onclick: () => file.click() }, "New phone? Load your backup"),
+      file),
+    el("p", { class: "note", style: "text-align:center;margin-bottom:24px" }, "Your book stays on this device. Nobody else can see it."));
 }
 
 function homeScreen() {
   const owing = book.customers.filter((customer) => balance(customer) > 0);
   const total = owing.reduce((sum, customer) => sum + balance(customer), 0);
-  const late = owing.filter((customer) => daysOwing(customer) >= 30).length;
+  const overdue = owing.filter((customer) => daysOwing(customer) >= 30).reduce((sum, customer) => sum + balance(customer), 0);
   const followUp = [...owing].sort((a, b) => daysOwing(b) - daysOwing(a)).slice(0, 3);
+  const left = daysToMonthEnd();
   const hour = new Date().getHours();
+  const file = backupPicker();
   const tile = (target, iconName, tone, title, text) =>
     el(typeof target === "string" ? "a" : "button", typeof target === "string" ? { class: "tile", href: target } : { class: "tile", onclick: target },
       el("span", { class: "bubble " + tone }, icon(iconName)),
-      el("strong", {}, title),
-      el("small", {}, text));
+      el("span", {}, el("strong", {}, title), el("small", {}, text)),
+      icon("right", 18));
   return el("div", {},
     el("header", { class: "top" },
-      el("div", { class: "brand" }, icon("book", 20), "KasiBook"),
+      el("div", { class: "topbar" },
+        el("div", { class: "brand" }, icon("book", 22), "KasiBook"),
+        el("p", { class: "date" }, icon("calendar", 18), new Date().toLocaleDateString("en-ZA", { weekday: "short", day: "numeric", month: "short", year: "numeric" })),
+        el("button", { class: "me", "aria-label": "Change shop name", onclick: renameShop }, initials(book.shop))),
       el("p", { class: "label" }, `Good ${hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening"}, welcome back`),
       el("h1", {}, el("button", { class: "shop", title: "Change shop name", onclick: renameShop }, book.shop, icon("edit", 18))),
       el("div", { class: "hero" },
-        el("p", { class: "label" }, "Customers owe you"),
-        el("p", { class: "total" }, rand(total)),
-        el("p", { class: "pills" },
-          el("span", { class: "pill" }, `${owing.length} of ${book.customers.length} customers owing`),
-          late > 0 && el("span", { class: "pill warn" }, `${late} over 30 days`)))),
+        el("div", { class: "hero-main" },
+          el("span", { class: "coin" }, icon("coins", 28)),
+          el("div", {}, el("p", { class: "label" }, "Customers owe you"), el("p", { class: "total" }, rand(total)))),
+        el("div", { class: "kpis" },
+          kpi("users", `${owing.length} of ${book.customers.length}`, "customers owing"),
+          kpi("calendar", rand(overdue), "over 30 days"),
+          kpi("clock", rand(paidSince(book.customers, 7)), "paid this week")))),
+    book.customers.some((customer) => customer.sample) && el("p", { class: "banner info" }, icon("users", 20),
+      el("span", {}, "Sample customers, so you can try KasiBook."),
+      el("button", { class: "send", onclick: clearSamples }, "Clear samples")),
+    owing.length > 0 && el("p", { class: "banner" }, icon("calendar", 20),
+      el("span", {}, left ? `Month end is in ${left} day${left === 1 ? "" : "s"}.` : "Today is month end.", el("i", {}, " A good time to send reminders.")),
+      el("a", { class: "send", href: "#list=remind" }, icon("send", 16), "Send reminders")),
     el("div", { class: "section" }, el("h2", {}, "What would you like to do?")),
     el("nav", { class: "tiles", "aria-label": "Main actions" },
-      tile("#list=sale", "bag", "", "Sold on credit", "Write a sale in the book"),
-      tile("#list=paid", "check", "gold", "Got paid", "Record a payment"),
-      tile("#list", "users", "blue", "Who owes me", "See all your customers"),
-      tile(() => customerForm(), "userPlus", "coral", "Add a customer", "Put a new name in the book")),
+      tile("#list=sale", "bag", "", "Sold on credit", "Write a sale"),
+      tile("#list=paid", "check", "gold", "Got paid", "Record payment"),
+      tile("#list", "users", "blue", "Who owes me", "See customers"),
+      tile(() => customerForm(), "userPlus", "coral", "Add a customer", "New customer")),
     followUp.length > 0 && [
       el("div", { class: "section" }, el("h2", {}, "Follow up first"), el("a", { href: "#list" }, "See all")),
-      el("ul", { class: "list" }, followUp.map((customer) => customerRow(customer)))],
-    book.customers.length === 0 && el("p", { class: "note" }, "Your book is empty. Tap \"Add a customer\" to write your first name in it."),
-    book.customers.some((customer) => customer.sample) && el("p", { class: "note" },
-      "These are sample customers so you can try KasiBook. ",
-      el("button", { class: "link", onclick: clearSamples }, "Clear samples")),
-    el("p", { class: "note", style: "margin-bottom:24px" }, "Saved on this phone. Works with no data."));
+      el("ul", { class: "list compact" }, tableHead(), followUp.map((customer) => customerRow(customer)))],
+    book.customers.length === 0 && emptyState("Your book is empty", "Start by adding your first customer. Then record what they buy on credit.", addButton("Add your first customer")),
+    el("section", { class: "card" },
+      el("h2", {}, "Keep a copy of your book"),
+      el("p", { class: "empty", style: "margin-bottom:14px" }, "Your book is saved only on this device. Download a backup now and then. On a new phone, load it to get your book back."),
+      el("div", { class: "pair" },
+        el("button", { class: "btn", onclick: downloadBackup }, "Download backup"),
+        el("button", { class: "btn", onclick: () => file.click() }, "Load backup")),
+      file),
+    el("p", { class: "note", style: "margin-bottom:24px" }, "Saved on this device. Works with no data."));
 }
 
-// The customer list. It also answers "who bought?" and "who paid?" from the home screen.
+// The customer list. It also answers "who bought?", "who paid?" and "who should I remind?".
 function listScreen(intent) {
-  const customers = [...book.customers].sort((a, b) => balance(b) - balance(a));
+  const customers = book.customers.filter((customer) => intent !== "remind" || balance(customer) > 0).sort((a, b) => balance(b) - balance(a));
   const rows = customers.map((customer) => customerRow(customer, intent));
-  const search = el("input", { id: "search", type: "search", autocomplete: "off", placeholder: "Search by name", "aria-label": "Search customers by name",
-    oninput: () => rows.forEach((row, i) => { row.hidden = !customers[i].name.toLowerCase().includes(search.value.trim().toLowerCase()); }) });
+  const monthOf = (t) => new Date(t).getFullYear() * 12 + new Date(t).getMonth();
+  const filters = [
+    ["All", () => true],
+    ["Over 30 days", (customer) => balance(customer) > 0 && daysOwing(customer) >= 30],
+    ["Bought this month", (customer) => customer.entries.some((entry) => entry.c > 0 && monthOf(entry.t) === monthOf(Date.now()))],
+  ];
+  let wanted = filters[0][1];
+  const none = el("p", { class: "note", hidden: true }, "No customers match.");
+  const show = () => {
+    const text = search.value.trim().toLowerCase();
+    rows.forEach((row, i) => { row.hidden = !(wanted(customers[i]) && customers[i].name.toLowerCase().includes(text)); });
+    none.hidden = rows.some((row) => !row.hidden);
+  };
+  const search = el("input", { id: "search", type: "search", autocomplete: "off", placeholder: "Search by name", "aria-label": "Search customers by name", oninput: show });
+  const pills = filters.map(([label, test], i) => el("button", { class: "filter", "aria-pressed": String(i === 0), onclick: () => {
+    wanted = test;
+    pills.forEach((pill, j) => pill.setAttribute("aria-pressed", String(i === j)));
+    show();
+  } }, `${label} (${customers.filter(test).length})`));
+  const title = { sale: "Who bought on credit?", paid: "Who paid you?", remind: "Send reminders" }[intent] ?? "Customers";
+  const hint = !customers.length ? (intent === "remind" ? "Nobody owes you right now." : "No customers in your book yet.")
+    : intent === "remind" ? "Tap Remind to open WhatsApp with the message already written." : "Tap a name to open their page.";
   return el("div", {},
     el("header", { class: "top" },
       el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
-      el("h1", { tabindex: "-1" }, { sale: "Who bought on credit?", paid: "Who paid you?" }[intent] ?? "Who owes you"),
-      el("p", { class: "label", style: "margin-top:6px" }, customers.length ? "Tap a name to open their page." : "No customers in your book yet.")),
-    customers.length > 0 && [el("div", { class: "search" }, icon("search", 20), search), el("ul", { class: "list" }, rows)],
-    el("div", { class: "bar" }, el("button", { class: "btn primary", onclick: () => customerForm() }, icon("userPlus", 20), "Add a new customer")));
+      el("h1", { tabindex: "-1" }, title),
+      el("p", { class: "label", style: "margin-top:6px" }, hint)),
+    customers.length > 0 ? [
+      el("div", { class: "search" }, icon("search", 20), search),
+      el("div", { class: "filters" }, pills),
+      el("ul", { class: "list" }, tableHead(), rows),
+      none]
+    : book.customers.length ? nothingYet("Nobody owes you right now", "When you sell on credit, the customer shows up here.") : noCustomers());
+}
+
+// Every sale and payment in the book, newest first.
+function transactionsScreen() {
+  const all = book.customers.flatMap((customer) => customer.entries.map((entry) => ({ ...entry, customer }))).sort((a, b) => b.t - a.t);
+  const entries = all.slice(0, 100);
+  const today = all.filter((entry) => entry.t >= new Date().setHours(0, 0, 0, 0));
+  const sum = (sign) => today.reduce((total, entry) => total + (Math.sign(entry.c) === sign ? Math.abs(entry.c) : 0), 0);
+  return el("div", {},
+    el("header", { class: "top" },
+      el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
+      el("h1", { tabindex: "-1" }, "Transactions"),
+      el("p", { class: "label", style: "margin-top:6px" }, "Every sale and payment, newest first."),
+      el("div", { class: "hero" }, el("div", { class: "kpis" },
+        kpi("bag", rand(sum(1)), "sold on credit today"),
+        kpi("check", rand(sum(-1)), "paid back today"),
+        kpi("repeat", String(today.length), "entries today")))),
+    entries.length
+      ? el("section", { class: "card" }, el("ul", { class: "history" }, entries.map((entry) => el("li", {},
+          el("span", {}, `${dateText(entry.t)} \u00b7 `, el("a", { href: "#c=" + entry.customer.id, style: "color:var(--green);font-weight:700" }, entry.customer.name), ` \u00b7 ${entry.c > 0 ? entry.n || "Bought on credit" : "Paid"}`),
+          el("strong", { class: entry.c > 0 ? "" : "paid" }, (entry.c > 0 ? "+" : "\u2212") + rand(Math.abs(entry.c)))))))
+      : book.customers.length ? nothingYet("Nothing written yet", "Sales and payments show up here as you record them.") : noCustomers());
 }
 
 function customerScreen(customer) {
@@ -511,7 +877,7 @@ function customerScreen(customer) {
   };
   const tab = (value, text, disabled) =>
     el("button", { class: "tab", "aria-pressed": String(paying === (value === "paid")), disabled, onclick: () => { mode = value; render(); } }, text);
-  return el("div", {},
+  return el("div", { class: "split" },
     el("header", { class: "top" },
       el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
       el("h1", { tabindex: "-1" }, customer.name),
@@ -522,7 +888,12 @@ function customerScreen(customer) {
         ageBadge(customer))),
     el("section", { class: "card" },
       el("div", { class: "tabs" }, tab("sale", "Sold on credit"), tab("paid", "Got paid", owed <= 0)),
-      el("h2", {}, paying ? "How much did they pay?" : "How much did they buy?"),
+      !paying && [
+        el("div", { class: "head" }, el("h2", {}, "What did they buy?"), el("button", { class: "link", onclick: priceForm }, "Change prices")),
+        el("div", { class: "items" }, ITEMS.map(([emoji, name, cents]) =>
+          el("button", { class: "item", onclick: () => record(customer, price(name, cents), error, name) },
+            el("span", { "aria-hidden": "true" }, emoji), name, el("small", {}, rand(price(name, cents))))))],
+      el("h2", {}, paying ? "How much did they pay?" : "Or tap an amount"),
       el("div", { class: "chips" }, [10, 20, 50, 100].map((rands) =>
         el("button", { class: "chip", onclick: () => record(customer, sign * rands * 100, error) }, (paying ? "R" : "+R") + rands))),
       el("form", { onsubmit: typed },
@@ -568,10 +939,20 @@ function render(moved) {
   const screen = route.startsWith("s=") ? statementScreen(decodeStatement(route.slice(2)))
     : !book ? welcomeScreen()
     : customer ? customerScreen(customer)
+    : route === "tx" ? transactionsScreen()
     : route.startsWith("list") ? listScreen(route.slice(5))
     : homeScreen();
+  const wide = view === "desktop" && bigScreen.matches;
+  const shell = Boolean(wide && book && !route.startsWith("s="));
+  document.body.classList.toggle("wide", wide);
+  $("app").classList.toggle("shell", shell);
+  const tabs = Boolean(!wide && book && !route.startsWith("s="));
+  screen.classList.toggle("main", shell);
+  screen.classList.toggle("has-tabs", tabs);
   if (moved) screen.classList.add("enter");
-  $("app").replaceChildren(screen);
+  // Phone view on a big screen: every page keeps a way back to the desktop view.
+  const wayBack = tabs && bigScreen.matches && el("button", { class: "viewswitch", onclick: () => setView("desktop") }, icon("left", 18), "Desktop view");
+  $("app").replaceChildren(...(shell ? [sidebar(route)] : []), screen, ...(tabs ? [tabbar(route)] : []), ...(wayBack ? [wayBack] : []));
 }
 
 addEventListener("hashchange", () => {
@@ -580,6 +961,7 @@ addEventListener("hashchange", () => {
   document.querySelector("h1")?.focus();
 });
 render(true);
+bigScreen.addEventListener("change", () => render());
 
 // Another open tab changed the book: show the newest copy so no tab overwrites the other.
 addEventListener("storage", (event) => {
@@ -600,6 +982,12 @@ if (location.search === "?test") {
   console.assert(balance(sipho) === 3000 && daysOwing(sipho, 20 * DAY) === 10, "balance and daysOwing");
   console.assert(decodeStatement(encodeStatement("Thandi's Spaza", sipho)).balance === 3000, "statement link");
   console.assert(decodeStatement("not a statement") === null, "bad statement link");
+  console.assert(paidSince([sipho], 7, 12 * DAY) === 5000 && paidSince([sipho], 7, 30 * DAY) === 0, "paidSince");
+  console.assert(recentItems({ entries: [{ c: 1, n: "Bread" }, { c: 1 }, { c: 1, n: "Milk" }] }) === "Milk · Bread", "recentItems");
+  console.assert(daysToMonthEnd(new Date(2026, 10, 17)) === 13, "daysToMonthEnd");
+  console.assert(parseDay("2026-11-03", Date.parse("2026-11-17")) === new Date(2026, 10, 3, 12).getTime() && parseDay("2026-02-31") === null && parseDay("2999-01-01") === null && parseDay("") === null, "parseDay");
+  const restored = checkBook({ shop: "X", customers: [{ id: "a", name: "Sipho", entries: [{ t: 1, c: 5e12 }, { t: "bad", c: 1 }] }, { id: "a", name: "Lindi", entries: [] }, { name: 7 }], prices: { Bread: 2000, Milk: -1 } });
+  console.assert(checkBook({}) === null && restored.customers.length === 2 && restored.customers[0].entries.length === 1 && restored.customers[0].entries[0].c === MAX_CENTS && restored.customers[1].id !== "a" && restored.prices.Bread === 2000 && !("Milk" in restored.prices), "checkBook");
   console.log("KasiBook self-check finished");
 }
 </script>
