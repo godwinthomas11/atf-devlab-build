@@ -10,7 +10,7 @@ Built at the Cape Code Hackathon, Africa Tech Festival, Cape Town, 17 November 2
 |---|---|---|---|
 | ![Welcome screen](docs/welcome.png) | ![Home screen](docs/home.png) | ![Customer screen](docs/customer.png) | ![Statement](docs/statement.png) |
 
-On a laptop or office computer, the welcome screen asks "How do you want to see KasiBook?" and offers a **Phone view** or a wider **Desktop view**. The choice can be changed at any time from the home screen.
+On a laptop or office computer, the welcome screen asks "How do you want to see KasiBook?" and offers a **Phone view** or a wider **Desktop view**. The choice can be changed at any time.
 
 ![Desktop view](docs/desktop.png)
 
@@ -27,12 +27,13 @@ This is a large part of everyday trade. About 150,000 spaza shops serve about 11
 
 ## What KasiBook does
 
-The home screen greets the owner and asks one question: "What would you like to do?" Four big buttons answer it: **Sold on credit**, **Got paid**, **Who owes me**, **Add a customer**. A bar at the bottom of the phone (a sidebar on a laptop) leads to **Customers**, **Transactions** (every sale and payment, newest first) and **Reminders** (everyone who owes, each with a WhatsApp button).
+The home screen greets the owner and asks one question: "What would you like to do?" Four big buttons answer it: **Sold on credit**, **Got paid**, **Who owes me**, **Add a customer**. A bar at the bottom of the phone (a sidebar on a laptop) leads to **Customers**, **Transactions** (every sale and payment, newest first, with today's totals) and **Reminders** (everyone who owes, each with a WhatsApp button).
 
 1. **Record in two taps.** Choose the customer, then tap what they bought (Bread, Maize meal, Milk, Airtime, Electricity, Cooking oil) or an amount such as `+R50`. Or type any amount. Payments work the same way, and every entry can be undone. Every customer in a list also has **Credit**, **Paid** and **Remind** buttons, so the common jobs are one tap from the home screen.
 2. **See who owes what.** The total owed is at the top, next to how much is over 30 days old and how much was paid back this week. Below it is a "Follow up first" list of who has owed the longest. Each customer has a label such as "Owing for 46 days" that turns amber after two weeks and red after a month.
 3. **Remind on WhatsApp.** One button opens WhatsApp with a polite message already written, including the balance.
 4. **The customer sees the same book.** The message carries a link to the customer's own statement: every sale, every payment, the balance. Both sides hold the same record, so there is nothing to argue about.
+5. **Move the paper book over, and never lose it.** A new customer can start with what they already owe in the paper book, and since which day. **Download backup** saves the whole book as a file, and **Load backup** brings it back on a new phone.
 
 ## For shop owners: you do not need to be technical
 
@@ -66,7 +67,7 @@ Tap **Clear samples** at the top of the home screen when you are ready to start 
 
 ## How we kept tokens low
 
-1. **Plan first, prompt once.** The problem, features, screens and edge cases were written down before any code was requested, so the app was generated in one pass with no rewrites.
+1. **Plan first, build small.** The problem, features, screens and edge cases were written down before any code was requested. The design changed a few times during the build, but the finished app is four small files, about 65 KB in total.
 2. **No framework, no packages, no build step.** Four small files in plain HTML, CSS and JavaScript. Nothing to scaffold, configure or debug.
 3. **No AI at runtime.** Balances, ageing and reminders are simple rules, so the app costs zero tokens to use and cannot stall in a demo.
 
