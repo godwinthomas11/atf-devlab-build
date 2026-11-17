@@ -136,24 +136,67 @@ dialog::backdrop { background: rgba(10, 30, 20, .55); }
   .top { border-radius: 32px 32px 28px 28px; }
   .bar { border-radius: 0 0 32px 32px; }
 }
-/* Desktop view: offered on a laptop or office computer, uses the full width */
+/* Desktop view: offered on a laptop or office computer. A sidebar for getting around, the page beside it. */
 .ask { margin-bottom: 6px; font-size: 16px; font-weight: 600; }
-.wide #app { max-width: 1040px; }
-.wide .tiles { grid-template-columns: repeat(4, 1fr); }
-.wide .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 12px; overflow: visible; background: none; box-shadow: none; }
-.wide .list li { border: 0 !important; border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
-.wide .kpis strong { font-size: 20px; }
-.wide .kpis span { font-size: 15px; }
-.wide .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.wide .steps li + li { border: 0; }
-.wide .welcome .card, .wide .viewcard { width: 100%; max-width: 480px; margin-right: auto; margin-left: auto; }
-.wide .bar .btn { max-width: 448px; margin: 0 auto; }
-.wide #app > .split { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto; }
-.wide .split > .top, .wide .split > .link { grid-column: 1 / -1; justify-self: stretch; }
-.wide .split > .link { justify-self: center; }
-.wide .split > section:first-of-type { grid-row: 2 / span 2; margin-right: 8px; }
-.wide .split > .whatsapp { align-self: start; margin-left: 8px; }
-.wide .split > section:last-of-type { margin-left: 8px; }
+body.wide { padding: 0; background: var(--bg); }
+.wide #app { max-width: none; min-height: 100vh; border-radius: 0; box-shadow: none; }
+.wide #app.shell { display: grid; grid-template-columns: 256px minmax(0, 1fr); align-items: start; background: linear-gradient(90deg, #0d4a2d 256px, var(--bg) 256px); }
+.wide #app > :not(.welcome):not(.side):not(.main) { align-self: center; width: 100%; max-width: 480px; }
+
+.side { position: sticky; top: 0; height: 100vh; padding: 28px 16px 20px; background: #0d4a2d; color: #fff; }
+.side .brand { margin: 0 12px 28px; font-size: 20px; }
+.side nav { display: flex; flex-direction: column; gap: 4px; }
+.navlink { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 12px; color: rgba(255, 255, 255, .86); font-size: 16px; font-weight: 600; text-decoration: none; }
+.navlink:hover { background: rgba(255, 255, 255, .08); }
+.navlink[aria-current="page"] { background: rgba(255, 255, 255, .16); color: #fff; }
+.side .btn { margin-top: 20px; border-color: #fff; }
+.side-foot { margin-top: auto; padding: 0 4px; color: rgba(255, 255, 255, .8); font-size: 13px; }
+.side-foot .ask { font-size: 13px; }
+.side-foot .tabs { margin-bottom: 14px; background: rgba(0, 0, 0, .28); }
+.side-foot .tab { height: 36px; color: rgba(255, 255, 255, .8); font-size: 14px; }
+.side-foot .tab[aria-pressed="true"] { color: var(--green); }
+
+.main { width: 100%; max-width: 1120px; margin: 0 auto; padding: 8px 24px 48px; }
+.main .top { padding: 24px 16px 0; border-radius: 0; background: none; color: var(--ink); }
+.main .top .brand, .main .bar, .main .viewcard, .main .row > .icon { display: none; }
+.main .top > .label { color: var(--muted); }
+.main .shop, .main .top h1 { color: var(--ink); font-size: 34px; letter-spacing: -.02em; }
+.main .back, .main .top .link { color: var(--green); }
+.main .hero { margin-top: 20px; padding: 24px 28px; border: 0; border-radius: 24px; color: #fff; background: radial-gradient(circle at 100% 0, rgba(255, 255, 255, .13) 0 150px, transparent 151px), linear-gradient(155deg, #0b4229, #0f5132 45%, #1a8553); box-shadow: 0 12px 32px rgba(15, 81, 50, .22); }
+.main .total { font-size: 56px; letter-spacing: -.02em; }
+.main .kpis { padding-top: 16px; }
+.main .kpis strong { font-size: 22px; }
+.main .kpis span { font-size: 15px; }
+.main .tiles { grid-template-columns: repeat(4, 1fr); }
+.main .tile { min-height: 0; }
+.main .list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.main .acts { grid-column: 2; grid-row: 1; padding: 0 16px 0 8px; }
+.main .bought { grid-column: 1 / -1; grid-row: 2; margin: -6px 16px 12px 74px; }
+.main .row { padding-right: 16px; }
+.wide #app > .main.split { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto; }
+.split > .top, .split > .link { grid-column: 1 / -1; }
+.main.split > .link { justify-self: center; }
+.main.split > section:first-of-type { grid-row: 2 / span 2; margin-right: 8px; }
+.main.split > .whatsapp { align-self: start; margin-left: 8px; }
+.main.split > section:last-of-type { margin-left: 8px; }
+
+.wide #app > .welcome { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; align-content: center; background: linear-gradient(90deg, #0d4a2d 50%, var(--bg) 50%); }
+.wide .welcome .top { grid-column: 1; grid-row: 1; padding: 0 64px; border-radius: 0; background: none; text-align: left; }
+.wide .welcome .logo { margin: 0 0 28px; }
+.wide .welcome h1 { font-size: 44px; line-height: 1.08; letter-spacing: -.02em; }
+.wide .welcome .lead { max-width: 24em; font-size: 20px; }
+.wide .welcome .steps { grid-column: 1; grid-row: 2; margin: 32px 64px 0; background: rgba(255, 255, 255, .1); box-shadow: none; color: #fff; }
+.wide .welcome .steps small { color: rgba(255, 255, 255, .86); font-size: 15px; }
+.wide .welcome .steps strong { font-size: 19px; }
+.wide .welcome .steps li + li { border-color: rgba(255, 255, 255, .18); }
+.wide .welcome .promise { grid-column: 1; grid-row: 3; justify-content: flex-start; margin: 20px 64px 0; color: #fff; }
+.wide .welcome .card { grid-column: 2; grid-row: 1 / span 2; align-self: center; justify-self: center; width: calc(100% - 96px); max-width: 440px; margin: 0; padding: 28px; }
+.wide .welcome .note { grid-column: 2; grid-row: 3; }
+@media (hover: hover) {
+  .row:hover { background: #f8f6f0; }
+  .tile:hover { box-shadow: 0 2px 4px rgba(23, 35, 28, .08), 0 14px 32px rgba(23, 35, 28, .12); }
+  .act:hover, .chip:hover, .item:hover { filter: brightness(.96); }
+}
 @media (prefers-reduced-motion: no-preference) {
   .chip, .btn, .tile { transition: transform .08s; }
   .enter { animation: enter .22s ease-out; }
@@ -292,6 +335,7 @@ function el(tag, attrs = {}, ...children) {
 
 // Line icons (Feather, MIT licence), drawn inline so the app needs no image files.
 const ICONS = {
+  home: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10",
   book: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z",
   bag: "M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z M3 6h18 M16 10a4 4 0 0 1-8 0",
   check: "M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4L12 14.01l-3-3",
@@ -335,6 +379,21 @@ function viewChoice() {
   return [
     el("p", { class: "ask" }, "How do you want to see KasiBook?"),
     el("div", { class: "tabs" }, tab("phone", "Phone view"), tab("desktop", "Desktop view"))];
+}
+
+// Desktop view only: where you are and where you can go, always in the same place.
+function sidebar(route) {
+  const here = route.startsWith("c=") ? "#list" : "#" + route;
+  const link = (href, iconName, text) => el("a", { class: "navlink", href, "aria-current": here === href && "page" }, icon(iconName, 20), text);
+  return el("aside", { class: "side" },
+    el("div", { class: "brand" }, icon("book", 22), "KasiBook"),
+    el("nav", { "aria-label": "Main" },
+      link("#", "home", "Home"),
+      link("#list", "users", "Customers"),
+      link("#list=sale", "bag", "Sold on credit"),
+      link("#list=paid", "check", "Got paid")),
+    el("button", { class: "btn", onclick: () => customerForm() }, icon("userPlus", 20), "Add a customer"),
+    el("div", { class: "side-foot" }, viewChoice(), el("p", {}, "Saved on this device. Works with no data.")));
 }
 
 let toastTimer;
@@ -512,7 +571,7 @@ function welcomeScreen() {
       shop,
       el("button", { class: "btn primary" }, "Start my book"),
       el("button", { type: "button", class: "btn ghost", onclick: () => startBook(shop.value.trim(), true) }, "Try it with sample customers")),
-    el("p", { class: "note", style: "text-align:center;margin-bottom:24px" }, "Your book stays on this phone. Nobody else can see it."));
+    el("p", { class: "note", style: "text-align:center;margin-bottom:24px" }, "Your book stays on this device. Nobody else can see it."));
 }
 
 function homeScreen() {
@@ -674,9 +733,13 @@ function render(moved) {
     : customer ? customerScreen(customer)
     : route.startsWith("list") ? listScreen(route.slice(5))
     : homeScreen();
-  document.body.classList.toggle("wide", view === "desktop" && bigScreen.matches);
+  const wide = view === "desktop" && bigScreen.matches;
+  const shell = Boolean(wide && book && !route.startsWith("s="));
+  document.body.classList.toggle("wide", wide);
+  $("app").classList.toggle("shell", shell);
+  if (shell) screen.classList.add("main");
   if (moved) screen.classList.add("enter");
-  $("app").replaceChildren(screen);
+  $("app").replaceChildren(...(shell ? [sidebar(route)] : []), screen);
 }
 
 addEventListener("hashchange", () => {
