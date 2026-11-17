@@ -160,7 +160,7 @@ input:focus { border-color: var(--green); outline: 0; }
 .history .paid { color: #187a4b; }
 .head { display: flex; justify-content: space-between; align-items: baseline; }
 
-#toast { position: fixed; left: 50%; top: 12px; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
+#toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom)); z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
 #toast[hidden] { display: none; }
 #toast .link { flex: none; color: var(--gold); }
 dialog { width: min(92vw, 440px); margin-top: 16px; padding: 22px; border: 0; border-radius: 22px; box-shadow: 0 30px 80px rgba(0, 0, 0, .35); }
@@ -180,7 +180,7 @@ body.wide { padding: 0; background: var(--bg); }
 .wide #app { max-width: none; min-height: 100vh; border-radius: 0; box-shadow: none; }
 .wide #app.shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: start; background: linear-gradient(90deg, var(--forest) 248px, var(--bg) 248px); }
 .wide #app > :not(.welcome):not(.side):not(.main) { align-self: center; width: 100%; max-width: 480px; }
-.wide #toast { top: auto; bottom: 24px; }
+.wide #toast { bottom: 24px; }
 
 .side { position: sticky; top: 0; height: 100vh; padding: 28px 16px 16px; background: var(--forest); color: #fff; }
 .side .brand { margin: 0 12px 32px; font-size: 22px; }
@@ -650,11 +650,17 @@ function downloadBackup() {
   toast("Backup saved in your Downloads. Send it to yourself on WhatsApp to keep it safe.");
 }
 
+// A hidden file box, kept on the page so every browser lets a button open it.
+const backupPicker = () => {
+  const file = el("input", { type: "file", accept: ".json,application/json", hidden: true, onchange: () => file.files[0] && loadBackup(file.files[0]) });
+  return file;
+};
+
 async function loadBackup(file) {
   let loaded = null;
   try { if (file.size < 5e6) loaded = checkBook(JSON.parse(await file.text())); } catch { /* not a JSON file: said below */ }
   if (!loaded) return toast("That file is not a KasiBook backup.");
-  if (!confirm(`Replace the book on this device with the backup of ${loaded.shop} (${loaded.customers.length} customers)?`)) return;
+  if (book && !confirm(`Replace the book on this device with the backup of ${loaded.shop} (${loaded.customers.length} customers)?`)) return;
   const before = book;
   book = loaded;
   save();
@@ -716,6 +722,7 @@ function whatsappLink(customer) {
 // First visit: says what KasiBook is, then starts a book in one tap.
 function welcomeScreen() {
   const shop = el("input", { id: "shop", maxlength: 40, autocomplete: "off", placeholder: "For example Thandi's Spaza" });
+  const file = backupPicker();
   const step = (iconName, tone, title, text) => el("li", {},
     el("span", { class: "bubble " + tone }, icon(iconName)),
     el("span", {}, el("strong", {}, title), el("small", {}, text)));
@@ -734,7 +741,9 @@ function welcomeScreen() {
       el("label", { for: "shop" }, "What is your shop called?"),
       shop,
       el("button", { class: "btn primary" }, "Start my book with sample customers"),
-      el("button", { type: "button", class: "btn ghost", onclick: () => startBook(shop.value.trim(), false) }, "Start with an empty book")),
+      el("button", { type: "button", class: "btn ghost", onclick: () => startBook(shop.value.trim(), false) }, "Start with an empty book"),
+      el("button", { type: "button", class: "link", style: "display:block;margin:10px auto 0", onclick: () => file.click() }, "New phone? Load your backup"),
+      file),
     el("p", { class: "note", style: "text-align:center;margin-bottom:24px" }, "Your book stays on this device. Nobody else can see it."));
 }
 
@@ -745,7 +754,7 @@ function homeScreen() {
   const followUp = [...owing].sort((a, b) => daysOwing(b) - daysOwing(a)).slice(0, 3);
   const left = daysToMonthEnd();
   const hour = new Date().getHours();
-  const file = el("input", { type: "file", accept: ".json,application/json", hidden: true, onchange: () => file.files[0] && loadBackup(file.files[0]) });
+  const file = backupPicker();
   const tile = (target, iconName, tone, title, text) =>
     el(typeof target === "string" ? "a" : "button", typeof target === "string" ? { class: "tile", href: target } : { class: "tile", onclick: target },
       el("span", { class: "bubble " + tone }, icon(iconName)),
