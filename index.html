@@ -106,6 +106,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .card, .list { margin: 16px 16px 0; border-radius: 18px; background: #fff; box-shadow: var(--shadow); }
 .section + .list, .section + .tiles { margin-top: 0; }
 .card { padding: 18px; }
+.blank { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 32px 20px; text-align: center; }
+.blank h2 { margin: 0; }
+.blank .btn { width: auto; min-width: 240px; margin-top: 12px; }
 .note { margin: 16px 20px 0; color: var(--muted); font-size: 16px; }
 .empty { color: var(--muted); }
 .list { list-style: none; padding: 0; overflow: hidden; }
@@ -183,6 +186,7 @@ body.wide { padding: 0; background: var(--bg); }
 .navlink { display: flex; align-items: center; gap: 14px; min-height: 46px; padding: 0 14px; border-radius: 12px; color: rgba(255, 255, 255, .88); font-size: 16px; font-weight: 600; text-decoration: none; }
 .navlink:hover { background: rgba(255, 255, 255, .08); }
 .navlink[aria-current="page"] { background: var(--green); color: #fff; }
+.side > .btn { margin-top: 20px; border-color: #fff; background: #fff; color: var(--green); box-shadow: none; }
 .side-foot { margin-top: auto; color: rgba(255, 255, 255, .8); font-size: 13px; }
 .side-foot .ask { font-size: 13px; }
 .side-foot .tabs { margin-bottom: 12px; background: rgba(0, 0, 0, .28); }
@@ -458,6 +462,7 @@ function sidebar(route) {
       link("#list", "users", "Customers"),
       link("#tx", "repeat", "Transactions"),
       link("#list=remind", "send", "Reminders")),
+    addButton(),
     el("div", { class: "side-foot" },
       viewChoice(),
       el("button", { class: "profile", title: "Change shop name", onclick: renameShop },
@@ -522,6 +527,13 @@ function historyList(entries) {
       el("span", {}, `${dateText(entry.t)} · ${entry.c > 0 ? entry.n || "Bought on credit" : "Paid"}`),
       el("strong", { class: entry.c > 0 ? "" : "paid" }, (entry.c > 0 ? "+" : "−") + rand(Math.abs(entry.c))))));
 }
+
+// Nothing to show yet: say so in plain words and offer the one thing to do next. No page is a dead end.
+const emptyState = (title, text, action) => el("section", { class: "card blank" },
+  el("span", { class: "bubble" }, icon("users", 26)), el("h2", {}, title), el("p", { class: "empty" }, text), action);
+const addButton = (text = "Add a customer") => el("button", { class: "btn primary", onclick: () => customerForm() }, icon("userPlus", 20), text);
+const noCustomers = () => emptyState("No customers yet", "Add your first customer's name. It takes a few seconds.", addButton());
+const nothingYet = (title, text) => emptyState(title, text, el("a", { class: "btn primary", href: "#list=sale" }, icon("bag", 20), "Record a sale"));
 
 // A pop-up form. onSave returns a problem to show, or nothing when all is well.
 function openForm(title, fields, onSave) {
@@ -697,7 +709,7 @@ function homeScreen() {
     followUp.length > 0 && [
       el("div", { class: "section" }, el("h2", {}, "Follow up first"), el("a", { href: "#list" }, "See all")),
       el("ul", { class: "list compact" }, tableHead(), followUp.map((customer) => customerRow(customer)))],
-    book.customers.length === 0 && el("p", { class: "note" }, "Your book is empty. Tap \"Add a customer\" to write your first name in it."),
+    book.customers.length === 0 && emptyState("Your book is empty", "Start by adding your first customer. Then record what they buy on credit.", addButton("Add your first customer")),
     book.customers.some((customer) => customer.sample) && el("p", { class: "note" },
       "These are sample customers so you can try KasiBook. ",
       el("button", { class: "link", onclick: clearSamples }, "Clear samples")),
@@ -735,11 +747,12 @@ function listScreen(intent) {
       el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
       el("h1", { tabindex: "-1" }, title),
       el("p", { class: "label", style: "margin-top:6px" }, hint)),
-    customers.length > 0 && [
+    customers.length > 0 ? [
       el("div", { class: "search" }, icon("search", 20), search),
       el("div", { class: "filters" }, pills),
       el("ul", { class: "list" }, tableHead(), rows),
-      none]);
+      none]
+    : book.customers.length ? nothingYet("Nobody owes you right now", "When you sell on credit, the customer shows up here.") : noCustomers());
 }
 
 // Every sale and payment in the book, newest first.
@@ -750,11 +763,11 @@ function transactionsScreen() {
       el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
       el("h1", { tabindex: "-1" }, "Transactions"),
       el("p", { class: "label", style: "margin-top:6px" }, "Every sale and payment, newest first.")),
-    el("section", { class: "card" }, entries.length
-      ? el("ul", { class: "history" }, entries.map((entry) => el("li", {},
+    entries.length
+      ? el("section", { class: "card" }, el("ul", { class: "history" }, entries.map((entry) => el("li", {},
           el("span", {}, `${dateText(entry.t)} \u00b7 `, el("a", { href: "#c=" + entry.customer.id, style: "color:var(--green);font-weight:700" }, entry.customer.name), ` \u00b7 ${entry.c > 0 ? entry.n || "Bought on credit" : "Paid"}`),
-          el("strong", { class: entry.c > 0 ? "" : "paid" }, (entry.c > 0 ? "+" : "\u2212") + rand(Math.abs(entry.c))))))
-      : el("p", { class: "empty" }, "Nothing written in the book yet.")));
+          el("strong", { class: entry.c > 0 ? "" : "paid" }, (entry.c > 0 ? "+" : "\u2212") + rand(Math.abs(entry.c)))))))
+      : book.customers.length ? nothingYet("Nothing written yet", "Sales and payments show up here as you record them.") : noCustomers());
 }
 
 function customerScreen(customer) {
