@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KasiBook: the spaza credit book</title>
+<meta name="description" content="A credit book for spaza shops. See who owes what and remind them on WhatsApp. Works offline.">
+<meta name="theme-color" content="#0f5132">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root { color-scheme: light; --green: #0f5132; --bg: #f6f3ec; --ink: #1c1b18; --muted: #5c5a52; --line: #e4dfd3; --gold: #f4c542; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+#app { max-width: 520px; min-height: 100vh; margin: 0 auto; padding-bottom: 104px; }
+h1, h2, p { margin: 0; }
+h1 { font-size: 26px; line-height: 1.2; }
+h2 { font-size: 18px; margin-bottom: 12px; }
+h1, #toast { overflow-wrap: anywhere; }
+button, input { font: inherit; color: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.top { background: var(--green); color: #fff; padding: 16px 20px 26px; border-radius: 0 0 24px 24px; }
+.top .label { font-size: 16px; opacity: .9; }
+.total { font-size: 46px; font-weight: 800; line-height: 1.15; margin: 2px 0; }
+.shop { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 8px; padding: 0; border: 0; background: none; color: #fff; font-size: 20px; font-weight: 700; cursor: pointer; }
+.back { display: inline-block; padding: 10px 0; color: #fff; font-weight: 600; text-decoration: none; }
+.top .link { color: #fff; padding-left: 0; font-weight: 600; }
+.top .badge { display: inline-block; margin-top: 6px; }
+
+.card, .list { background: #fff; border-radius: 18px; margin: 16px; box-shadow: 0 1px 2px rgba(0, 0, 0, .06); }
+.card { padding: 18px; }
+.note { margin: 16px 20px 0; color: var(--muted); font-size: 16px; }
+.empty { color: var(--muted); }
+.list { list-style: none; padding: 0; overflow: hidden; }
+.list li + li, .history li + li { border-top: 1px solid var(--line); }
+.row { display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 14px 16px; color: inherit; text-decoration: none; }
+.row::after { content: "›"; color: var(--muted); font-size: 24px; }
+.row:active { background: #f3f0e8; }
+.avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #e3efe7; color: var(--green); font-weight: 800; }
+.who { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.who strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.amt { font-size: 19px; font-weight: 800; white-space: nowrap; }
+.badge { padding: 2px 10px; border-radius: 99px; background: #ece8dd; color: #45423a; font-size: 14px; font-weight: 600; }
+.badge.due { background: #fde9b8; color: #5e4100; }
+.badge.late { background: #fbd5d0; color: #8a1c12; }
+.badge.ok { background: #d7f0df; color: var(--green); }
+
+.chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.chip { height: 60px; border: 2px solid var(--green); border-radius: 14px; background: #fff; color: var(--green); font-size: 19px; font-weight: 800; cursor: pointer; }
+label { display: block; margin-bottom: 6px; font-size: 16px; font-weight: 600; }
+input { width: 100%; height: 56px; margin-bottom: 12px; padding: 0 16px; border: 2px solid #b9b3a4; border-radius: 14px; background: #fff; }
+.btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 56px; padding: 8px 16px; border: 2px solid var(--green); border-radius: 14px; background: #fff; color: var(--green); font-weight: 700; text-align: center; text-decoration: none; cursor: pointer; }
+.btn.primary { background: var(--green); color: #fff; }
+.btn.ghost { margin-top: 10px; border-color: transparent; background: #eef3ee; }
+.btn.whatsapp { width: auto; margin: 0 16px; border-color: #25d366; background: #25d366; color: #06301a; }
+.chip:active, .btn:active { transform: scale(.97); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.error { margin-bottom: 10px; color: #a3190d; font-size: 16px; font-weight: 600; }
+.error:empty { display: none; }
+.link { padding: 8px 4px; border: 0; background: none; color: var(--green); font-weight: 700; text-decoration: underline; cursor: pointer; }
+.link.danger { display: block; margin: 8px auto; color: #a3190d; }
+.history { list-style: none; margin: 0; padding: 0; }
+.history li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; font-size: 16px; }
+.history .paid { color: #187a4b; }
+.history strong { white-space: nowrap; }
+.head { display: flex; justify-content: space-between; align-items: baseline; }
+
+.bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 30%); }
+.bar .btn { max-width: 488px; margin: 0 auto; box-shadow: 0 6px 16px rgba(15, 81, 50, .25); }
+#toast { position: fixed; left: 16px; right: 16px; bottom: 20px; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; max-width: 488px; margin: 0 auto; padding: 10px 16px; border-radius: 14px; background: var(--ink); color: #fff; font-size: 16px; }
+#toast[hidden] { display: none; }
+#toast .link { color: var(--gold); }
+dialog { width: min(92vw, 440px); margin-top: 16px; padding: 22px; border: 0; border-radius: 20px; }
+dialog::backdrop { background: rgba(0, 0, 0, .5); }
+@media (prefers-reduced-motion: no-preference) { .chip, .btn { transition: transform .08s; } }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<div id="toast" role="status" hidden></div>
+<dialog id="dialog"></dialog>
+<script>
+"use strict";
+const STORE = "kasibook-v1";
+const DAY = 864e5;
+const MAX_CENTS = 100000 * 100;
+
+// ---------- Rules (no page access) ----------
+
+// Money is kept in whole cents so totals never pick up rounding errors.
+const rand = (cents) => "R" + (cents / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+function parseCents(text) {
+  const cents = Math.round(Number(String(text).trim().replace(",", ".")) * 100);
+  return Number.isInteger(cents) && cents > 0 && cents <= MAX_CENTS ? cents : null;
+}
+
+// 082 123 4567 -> 27821234567, the format WhatsApp links need.
+function waNumber(phone) {
+  const digits = String(phone).replace(/\D/g, "");
+  if (/^0\d{9}$/.test(digits)) return "27" + digits.slice(1);
+  return /^27\d{9}$/.test(digits) ? digits : null;
+}
+
+const balance = (customer) => customer.entries.reduce((sum, entry) => sum + entry.c, 0);
+
+// Payments settle the oldest sales first. Returns the age of the oldest unpaid sale.
+function daysOwing(customer, now = Date.now()) {
+  const unpaid = [];
+  for (const entry of customer.entries) {
+    if (entry.c > 0) { unpaid.push({ t: entry.t, left: entry.c }); continue; }
+    let paid = -entry.c;
+    while (paid > 0 && unpaid.length) {
+      const part = Math.min(paid, unpaid[0].left);
+      unpaid[0].left -= part;
+      paid -= part;
+      if (!unpaid[0].left) unpaid.shift();
+    }
+  }
+  return unpaid.length ? Math.floor((now - unpaid[0].t) / DAY) : 0;
+}
+
+// A statement travels inside the link itself, so no server ever sees it.
+function encodeStatement(shop, customer) {
+  const data = { s: shop, n: customer.name, b: balance(customer), e: customer.entries.slice(-12).map((entry) => [entry.t, entry.c]) };
+  const bytes = new TextEncoder().encode(JSON.stringify(data));
+  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+const clampCents = (n) => Math.max(-MAX_CENTS, Math.min(MAX_CENTS, Math.round(n)));
+
+function decodeStatement(text) {
+  try {
+    const binary = atob(text.replace(/-/g, "+").replace(/_/g, "/"));
+    const data = JSON.parse(new TextDecoder().decode(Uint8Array.from(binary, (ch) => ch.charCodeAt(0))));
+    if (typeof data.s !== "string" || typeof data.n !== "string" || !Number.isFinite(data.b) || !Array.isArray(data.e)) return null;
+    const entries = data.e.filter((e) => Array.isArray(e) && Number.isFinite(e[0]) && Number.isFinite(e[1])).slice(0, 12);
+    return { shop: data.s.slice(0, 40), name: data.n.slice(0, 40), balance: clampCents(data.b), entries: entries.map(([t, c]) => ({ t, c: clampCents(c) })) };
+  } catch {
+    return null;
+  }
+}
+
+// ---------- Saved data (stays on this phone) ----------
+
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+function sampleBook() {
+  const now = Date.now();
+  const sample = (name, rows) => ({ id: "sample-" + name.split(" ")[0].toLowerCase(), name, phone: "", sample: true, entries: rows.map(([daysAgo, c]) => ({ t: now - daysAgo * DAY, c })) });
+  return {
+    shop: "Thandi's Spaza",
+    customers: [
+      sample("Nomsa Khumalo", [[9, 12000], [5, 8500], [2, -2000]]),
+      sample("Tshepo Mokoena", [[46, 25000], [30, 9000]]),
+      sample("Sibusiso Dlamini", [[18, 9500]]),
+    ],
+  };
+}
+
+function load() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE));
+    if (saved && typeof saved.shop === "string" && Array.isArray(saved.customers)) return saved;
+  } catch { /* unreadable or blocked storage: start with the sample book */ }
+  return sampleBook();
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORE, JSON.stringify(book));
+  } catch {
+    alert("Could not save on this phone. Check its storage space.");
+  }
+}
+
+let book = load();
+
+// ---------- Page building ----------
+
+const $ = (id) => document.getElementById(id);
+
+// Text is always added as text, never as HTML, so a name can never break the page.
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [name, value] of Object.entries(attrs)) {
+    if (name.startsWith("on")) node.addEventListener(name.slice(2), value);
+    else if (value !== false && value != null) node.setAttribute(name, value === true ? "" : value);
+  }
+  node.append(...children.flat().filter((child) => child != null && child !== false));
+  return node;
+}
+
+let toastTimer;
+function toast(text, undo) {
+  const box = $("toast");
+  box.replaceChildren(text, undo ? el("button", { class: "link", onclick: () => { box.hidden = true; undo(); } }, "Undo") : "");
+  box.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { box.hidden = true; }, 7000);
+}
+
+const dateText = (t) => new Date(t).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" });
+
+function ageBadge(customer) {
+  if (balance(customer) <= 0) return el("span", { class: "badge ok" }, "Paid up");
+  const days = daysOwing(customer);
+  const text = days < 1 ? "Owing since today" : `Owing for ${days} day${days === 1 ? "" : "s"}`;
+  return el("span", { class: "badge" + (days >= 30 ? " late" : days >= 14 ? " due" : "") }, text);
+}
+
+function historyList(entries) {
+  if (!entries.length) return el("p", { class: "empty" }, "Nothing written in the book yet.");
+  return el("ul", { class: "history" }, [...entries].reverse().map((entry) =>
+    el("li", {},
+      el("span", {}, `${dateText(entry.t)} · ${entry.c > 0 ? "Bought on credit" : "Paid"}`),
+      el("strong", { class: entry.c > 0 ? "" : "paid" }, (entry.c > 0 ? "+" : "−") + rand(Math.abs(entry.c))))));
+}
+
+// A pop-up form. onSave returns a problem to show, or nothing when all is well.
+function openForm(title, fields, onSave) {
+  const error = el("p", { class: "error", role: "alert" });
+  const inputs = fields.map((field) => el("input", { id: field.id, value: field.value ?? "", autocomplete: "off", ...field.attrs }));
+  const submit = (event) => {
+    event.preventDefault();
+    const problem = onSave(...inputs.map((input) => input.value.trim()));
+    if (problem) { error.textContent = problem; return; }
+    $("dialog").close();
+    render();
+  };
+  $("dialog").replaceChildren(el("form", { onsubmit: submit },
+    el("h2", {}, title),
+    fields.flatMap((field, i) => [el("label", { for: field.id }, field.label), inputs[i]]),
+    error,
+    el("div", { class: "pair" },
+      el("button", { type: "button", class: "btn ghost", style: "margin:0", onclick: () => $("dialog").close() }, "Cancel"),
+      el("button", { class: "btn primary" }, "Save"))));
+  $("dialog").showModal();
+}
+
+// ---------- Actions ----------
+
+function renameShop() {
+  openForm("Your shop's name", [{ id: "shop-name", label: "Shop name", value: book.shop, attrs: { maxlength: 40 } }], (name) => {
+    if (!name) return "Please type your shop's name.";
+    book.shop = name;
+    save();
+  });
+}
+
+function customerForm(customer) {
+  openForm(customer ? "Change customer" : "Add customer", [
+    { id: "customer-name", label: "Name", value: customer?.name, attrs: { maxlength: 40 } },
+    { id: "customer-phone", label: "WhatsApp number (optional)", value: customer?.phone, attrs: { inputmode: "tel", placeholder: "082 123 4567" } },
+  ], (name, phone) => {
+    if (!name) return "Please type the customer's name.";
+    if (phone && !waNumber(phone)) return "Use a South African cell number, like 082 123 4567.";
+    if (customer) Object.assign(customer, { name, phone, sample: false });
+    else {
+      const added = { id: newId(), name, phone, entries: [] };
+      book.customers.push(added);
+      location.hash = "c=" + added.id;
+    }
+    save();
+  });
+}
+
+function record(customer, cents, error) {
+  const owed = balance(customer);
+  if (cents < 0 && -cents > owed) { error.textContent = `${customer.name} only owes ${rand(owed)}.`; return; }
+  if (owed + cents > MAX_CENTS) { error.textContent = `One customer can owe at most ${rand(MAX_CENTS)}.`; return; }
+  const entry = { t: Date.now(), c: cents };
+  customer.entries.push(entry);
+  save();
+  render();
+  toast(cents > 0 ? `Added ${rand(cents)} to ${customer.name}` : `${customer.name} paid ${rand(-cents)}`, () => {
+    customer.entries.splice(customer.entries.indexOf(entry), 1);
+    save();
+    render();
+  });
+}
+
+function undoLast(customer) {
+  const removed = customer.entries.pop();
+  save();
+  render();
+  toast("Last entry removed", () => {
+    customer.entries.push(removed);
+    save();
+    render();
+  });
+}
+
+function removeCustomer(customer) {
+  if (!confirm(`Delete ${customer.name} and their history? This cannot be undone.`)) return;
+  book.customers = book.customers.filter((other) => other !== customer);
+  save();
+  location.hash = "";
+}
+
+function clearSamples() {
+  book.customers = book.customers.filter((customer) => !customer.sample);
+  save();
+  render();
+}
+
+function whatsappLink(customer) {
+  const owed = balance(customer);
+  const first = customer.name.split(" ")[0];
+  const statement = location.href.split("#")[0] + "#s=" + encodeStatement(book.shop, customer);
+  const text = owed > 0
+    ? `Hi ${first}, a friendly reminder from ${book.shop}: your balance is ${rand(owed)}.\n\nSee your statement:\n${statement}\n\nThank you!`
+    : `Hi ${first}, your account at ${book.shop} is paid up. Thank you!\n\nYour statement:\n${statement}`;
+  return `https://wa.me/${waNumber(customer.phone) ?? ""}?text=${encodeURIComponent(text)}`;
+}
+
+// ---------- Screens ----------
+
+function homeScreen() {
+  const customers = [...book.customers].sort((a, b) => balance(b) - balance(a));
+  const total = customers.reduce((sum, customer) => sum + balance(customer), 0);
+  const owing = customers.filter((customer) => balance(customer) > 0).length;
+  return el("div", {},
+    el("header", { class: "top" },
+      el("p", { class: "label" }, "KasiBook · your shop's credit book"),
+      el("h1", {}, el("button", { class: "shop", title: "Change shop name", onclick: renameShop }, book.shop, el("span", { "aria-hidden": "true" }, "✎"))),
+      el("p", { class: "label" }, "Total owed to you"),
+      el("p", { class: "total" }, rand(total)),
+      el("p", { class: "label" }, `${owing} of ${customers.length} customers owe you`)),
+    book.customers.some((customer) => customer.sample) && el("p", { class: "note" },
+      "These are sample customers so you can try KasiBook. ",
+      el("button", { class: "link", onclick: clearSamples }, "Clear samples")),
+    customers.length
+      ? el("ul", { class: "list" }, customers.map((customer) =>
+          el("li", {}, el("a", { class: "row", href: "#c=" + customer.id },
+            el("span", { class: "avatar", "aria-hidden": "true" }, [...customer.name][0].toUpperCase()),
+            el("span", { class: "who" }, el("strong", {}, customer.name), ageBadge(customer)),
+            el("span", { class: "amt" }, rand(balance(customer)))))))
+      : el("p", { class: "note" }, "No customers yet. Tap the button below to add your first one."),
+    el("div", { class: "bar" }, el("button", { class: "btn primary", onclick: () => customerForm() }, "+ Add customer")));
+}
+
+function customerScreen(customer) {
+  const owed = balance(customer);
+  const error = el("p", { class: "error", role: "alert" });
+  const amount = el("input", { id: "amount", inputmode: "decimal", autocomplete: "off", placeholder: "For example 35.50" });
+  const typed = (sign) => {
+    const cents = parseCents(amount.value);
+    if (cents) return record(customer, sign * cents, error);
+    error.textContent = "Type an amount in rands, for example 35.50";
+    amount.focus();
+  };
+  return el("div", {},
+    el("header", { class: "top" },
+      el("a", { class: "back", href: "#" }, "‹ All customers"),
+      el("h1", { tabindex: "-1" }, customer.name),
+      el("button", { class: "link", onclick: () => customerForm(customer) }, customer.phone || "Add WhatsApp number"),
+      el("p", { class: "label" }, "Owes you"),
+      el("p", { class: "total" }, rand(owed)),
+      ageBadge(customer)),
+    el("section", { class: "card" },
+      el("h2", {}, "Sold on credit? Tap the amount"),
+      el("div", { class: "chips" }, [10, 20, 50, 100].map((rands) =>
+        el("button", { class: "chip", onclick: () => record(customer, rands * 100, error) }, "+R" + rands))),
+      el("form", { onsubmit: (event) => { event.preventDefault(); typed(1); } },
+        el("label", { for: "amount" }, "Or type another amount"),
+        amount,
+        error,
+        el("div", { class: "pair" },
+          el("button", { class: "btn" }, "Add to book"),
+          el("button", { type: "button", class: "btn", onclick: () => typed(-1) }, "Paid amount"))),
+      owed > 0 && el("button", { class: "btn ghost", onclick: () => record(customer, -owed, error) }, `Paid in full (${rand(owed)})`)),
+    el("a", { class: "btn whatsapp", href: whatsappLink(customer), target: "_blank", rel: "noopener" },
+      owed > 0 ? "Remind on WhatsApp" : "Send statement on WhatsApp"),
+    el("section", { class: "card" },
+      el("div", { class: "head" },
+        el("h2", {}, "History"),
+        customer.entries.length > 0 && el("button", { class: "link", onclick: () => undoLast(customer) }, "Remove last entry")),
+      historyList(customer.entries)),
+    el("button", { class: "link danger", onclick: () => removeCustomer(customer) }, "Delete this customer"));
+}
+
+// What a customer sees when they open the link in their WhatsApp message.
+function statementScreen(statement) {
+  if (!statement) {
+    return el("section", { class: "card" },
+      el("h1", {}, "This statement did not open"),
+      el("p", { class: "empty" }, "Please ask the shop to send it again."));
+  }
+  return el("div", {},
+    el("header", { class: "top" },
+      el("p", { class: "label" }, statement.shop),
+      el("h1", { tabindex: "-1" }, `Statement for ${statement.name}`),
+      el("p", { class: "label", style: "margin-top:10px" }, statement.balance > 0 ? "You owe" : "You are paid up"),
+      el("p", { class: "total" }, rand(Math.max(0, statement.balance)))),
+    el("section", { class: "card" }, el("h2", {}, "Latest entries"), historyList(statement.entries)),
+    el("p", { class: "note" }, "This is a copy of your page in the shop's credit book, from the day it was sent. The shop's own book is the final record. If something looks wrong, speak to the shop owner."),
+    el("p", { class: "note" }, el("a", { href: "#", style: "color:var(--green);font-weight:700" }, "Run a shop? Keep your own book with KasiBook")));
+}
+
+function render() {
+  const route = location.hash.slice(1);
+  const customer = route.startsWith("c=") && book.customers.find((c) => c.id === route.slice(2));
+  $("app").replaceChildren(
+    route.startsWith("s=") ? statementScreen(decodeStatement(route.slice(2)))
+    : customer ? customerScreen(customer)
+    : homeScreen());
+}
+
+addEventListener("hashchange", () => {
+  render();
+  scrollTo(0, 0);
+  document.querySelector("h1")?.focus();
+});
+render();
+
+// Another open tab changed the book: show the newest copy so no tab overwrites the other.
+addEventListener("storage", (event) => {
+  if (event.key === STORE) { book = load(); render(); }
+});
+
+// Saves a copy of the app on the phone so it opens with no internet.
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  navigator.serviceWorker.register("sw.js");
+}
+
+// Self-check of the rules: open index.html?test and read the browser console.
+if (location.search === "?test") {
+  const sipho = { name: "Sipho", entries: [{ t: 0, c: 5000 }, { t: 10 * DAY, c: 3000 }, { t: 11 * DAY, c: -5000 }] };
+  console.assert(rand(124050) === "R1 240.50", "rand");
+  console.assert(parseCents("35,5") === 3550 && parseCents("0") === null && parseCents("abc") === null, "parseCents");
+  console.assert(waNumber("082 123 4567") === "27821234567" && waNumber("12345") === null, "waNumber");
+  console.assert(balance(sipho) === 3000 && daysOwing(sipho, 20 * DAY) === 10, "balance and daysOwing");
+  console.assert(decodeStatement(encodeStatement("Thandi's Spaza", sipho)).balance === 3000, "statement link");
+  console.assert(decodeStatement("not a statement") === null, "bad statement link");
+  console.log("KasiBook self-check finished");
+}
+</script>
+</body>
+</html>
