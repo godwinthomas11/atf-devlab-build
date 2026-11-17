@@ -6,9 +6,9 @@
 
 Built at the Cape Code Hackathon, Africa Tech Festival, Cape Town, 17 November 2026.
 
-| Who owes what | Record in two taps | What the customer sees |
-|---|---|---|
-| ![Home screen](docs/home.png) | ![Customer screen](docs/customer.png) | ![Statement](docs/statement.png) |
+| Welcome | Home | Record in two taps | What the customer sees |
+|---|---|---|---|
+| ![Welcome screen](docs/welcome.png) | ![Home screen](docs/home.png) | ![Customer screen](docs/customer.png) | ![Statement](docs/statement.png) |
 
 ## The African problem
 
@@ -23,19 +23,21 @@ This is a large part of everyday trade. About 150,000 spaza shops serve about 11
 
 ## What KasiBook does
 
-1. **Record in two taps.** Tap a customer, tap `+R10`, `+R20`, `+R50` or `+R100`. Or type any amount. Payments are one tap too, and every entry can be undone.
-2. **See who owes what.** The total owed is at the top. Customers are sorted by the biggest balance, each with a label such as "Owing for 46 days" that turns amber after two weeks and red after a month.
+The home screen greets the owner and asks one question: "What would you like to do?" Four big buttons answer it: **Sold on credit**, **Got paid**, **Who owes me**, **Add a customer**.
+
+1. **Record in two taps.** Choose the customer, tap `+R10`, `+R20`, `+R50` or `+R100`. Or type any amount. Payments work the same way, and every entry can be undone.
+2. **See who owes what.** The total owed is at the top, with a "Follow up first" list of who has owed the longest. Each customer has a label such as "Owing for 46 days" that turns amber after two weeks and red after a month.
 3. **Remind on WhatsApp.** One button opens WhatsApp with a polite message already written, including the balance.
 4. **The customer sees the same book.** The message carries a link to the customer's own statement: every sale, every payment, the balance. Both sides hold the same record, so there is nothing to argue about.
 
 ## For shop owners: you do not need to be technical
 
-1. Open the link on your phone.
+1. Open the link on your phone. Type your shop's name and tap **Start my book**.
 2. Tap your browser's menu and choose **Add to Home screen**. KasiBook now opens like any other app, even with no data.
-3. Tap **+ Add customer** and type a name. A WhatsApp number is optional.
-4. When they buy on credit, tap their name and tap the amount. That is all.
+3. Tap **Add a customer** and type a name. A WhatsApp number is optional.
+4. When they buy on credit, tap **Sold on credit**, tap their name and tap the amount. That is all.
 
-The three sample customers are there so you can try it first. Tap **Clear samples** when you are ready to start your own book.
+Not sure yet? Tap **Try it with sample customers** on the welcome screen. Tap **Clear samples** when you are ready to start your own book.
 
 ## How it works
 
