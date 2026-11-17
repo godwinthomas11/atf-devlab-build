@@ -63,8 +63,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .kpis span { display: block; font-size: 13px; line-height: 1.25; opacity: .92; }
 .banner { display: flex; align-items: center; gap: 10px; margin: 16px 16px 0; padding: 10px 10px 10px 16px; border-radius: 16px; background: #fff0c7; color: #5e4100; font-size: 15px; font-weight: 600; line-height: 1.3; }
 .banner span { flex: 1; }
+.banner.info { background: #e6f3e9; color: #073d2d; }
 .banner i { display: none; font-style: normal; }
-.send { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border-radius: 12px; background: var(--forest); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.send { flex: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border-radius: 12px; background: var(--forest); color: #fff; font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
 
 /* Home */
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px; }
@@ -659,12 +660,12 @@ function welcomeScreen() {
       step("clock", "gold", "See who owes you", "Every balance, and how long it has been owing."),
       step("chat", "blue", "Remind them on WhatsApp", "One tap sends a polite message with their statement.")),
     el("p", { class: "promise" }, icon("phone", 18), "Works with no data. No sign-up. Free."),
-    el("form", { class: "card", onsubmit: (event) => { event.preventDefault(); startBook(shop.value.trim(), false); } },
+    el("form", { class: "card", onsubmit: (event) => { event.preventDefault(); startBook(shop.value.trim(), true); } },
       viewChoice(),
       el("label", { for: "shop" }, "What is your shop called?"),
       shop,
-      el("button", { class: "btn primary" }, "Start my book"),
-      el("button", { type: "button", class: "btn ghost", onclick: () => startBook(shop.value.trim(), true) }, "Try it with sample customers")),
+      el("button", { class: "btn primary" }, "Start my book with sample customers"),
+      el("button", { type: "button", class: "btn ghost", onclick: () => startBook(shop.value.trim(), false) }, "Start with an empty book")),
     el("p", { class: "note", style: "text-align:center;margin-bottom:24px" }, "Your book stays on this device. Nobody else can see it."));
 }
 
@@ -697,6 +698,9 @@ function homeScreen() {
           kpi("users", `${owing.length} of ${book.customers.length}`, "customers owing"),
           kpi("calendar", rand(overdue), "over 30 days"),
           kpi("clock", rand(paidSince(book.customers, 7)), "paid this week")))),
+    book.customers.some((customer) => customer.sample) && el("p", { class: "banner info" }, icon("users", 20),
+      el("span", {}, "Sample customers, so you can try KasiBook."),
+      el("button", { class: "send", onclick: clearSamples }, "Clear samples")),
     owing.length > 0 && el("p", { class: "banner" }, icon("calendar", 20),
       el("span", {}, left ? `Month end is in ${left} day${left === 1 ? "" : "s"}.` : "Today is month end.", el("i", {}, " A good time to send reminders.")),
       el("a", { class: "send", href: "#list=remind" }, icon("send", 16), "Send reminders")),
@@ -710,9 +714,6 @@ function homeScreen() {
       el("div", { class: "section" }, el("h2", {}, "Follow up first"), el("a", { href: "#list" }, "See all")),
       el("ul", { class: "list compact" }, tableHead(), followUp.map((customer) => customerRow(customer)))],
     book.customers.length === 0 && emptyState("Your book is empty", "Start by adding your first customer. Then record what they buy on credit.", addButton("Add your first customer")),
-    book.customers.some((customer) => customer.sample) && el("p", { class: "note" },
-      "These are sample customers so you can try KasiBook. ",
-      el("button", { class: "link", onclick: clearSamples }, "Clear samples")),
     el("p", { class: "note", style: "margin-bottom:24px" }, "Saved on this device. Works with no data."));
 }
 

@@ -36,12 +36,12 @@ The home screen greets the owner and asks one question: "What would you like to 
 
 ## For shop owners: you do not need to be technical
 
-1. Open the link on your phone. Type your shop's name and tap **Start my book**.
+1. Open the link on your phone. Type your shop's name and tap **Start my book with sample customers**. Three sample customers show you how everything works.
 2. Tap your browser's menu and choose **Add to Home screen**. KasiBook now opens like any other app, even with no data.
 3. Tap **Add a customer** and type a name. A WhatsApp number is optional.
 4. When they buy on credit, tap **Sold on credit**, tap their name and tap the amount. That is all.
 
-Not sure yet? Tap **Try it with sample customers** on the welcome screen. Tap **Clear samples** when you are ready to start your own book.
+Tap **Clear samples** at the top of the home screen when you are ready to start your own book. Or choose **Start with an empty book** on the welcome screen.
 
 ## How it works
 
