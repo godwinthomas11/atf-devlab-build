@@ -1,0 +1,10 @@
+{
+  "name": "KasiBook",
+  "short_name": "KasiBook",
+  "description": "The spaza credit book. See who owes what and remind them on WhatsApp.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f6f3ec",
+  "theme_color": "#0f5132",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
