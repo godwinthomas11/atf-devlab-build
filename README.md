@@ -50,7 +50,7 @@ Tap **Clear samples** at the top of the home screen when you are ready to start 
 - **Statements with no server.** A customer's statement is packed into the link itself. Opening the link unpacks it on the customer's phone.
 - **WhatsApp with no API.** Reminders use an ordinary `wa.me` link. Local numbers such as `082 123 4567` are converted to the international format WhatsApp needs.
 - **Money is exact.** Amounts are stored as whole cents, so totals never drift.
-- **Example prices.** The prices on the item buttons are examples for the demo. Every shop charges its own prices, and any amount can be typed.
+- **Example prices.** The prices on the item buttons are examples for the demo. A shop sets its own with "Change prices", and any amount can be typed.
 
 | File | Job |
 |---|---|
@@ -72,7 +72,7 @@ Tap **Clear samples** at the top of the home screen when you are ready to start 
 
 ## Limits and what is next
 
-- The book lives on one phone. A backup and a move-to-new-phone option come next.
+- The book lives on one phone. "Download backup" saves a copy as a file, and "Load backup" brings it back on a new phone. Automatic backup comes next.
 - Statement links can be read by anyone who has the link, so they hold only the customer's name, the shop's name and the last 12 entries.
 - Next: more languages, pay-day reminders, and using a shop's KasiBook history as proof of trade when asking wholesalers for stock on credit.
 

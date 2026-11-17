@@ -54,6 +54,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .me { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, .3); border-radius: 50%; background: rgba(255, 255, 255, .16); color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; }
 .date { display: none; }
 .hero { margin-top: 14px; padding: 16px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 18px; background: rgba(3, 40, 28, .42); }
+.hero > .kpis:first-child { margin: 0; padding: 0; border: 0; }
 .hero-main { display: flex; align-items: center; gap: 14px; }
 .hero-main .total { margin: 0; font-size: 38px; }
 .coin { flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; background: rgba(255, 255, 255, .14); }
@@ -213,6 +214,7 @@ body.wide { padding: 0; background: var(--bg); }
 .main .coin { width: 72px; height: 72px; border-radius: 20px; }
 .main .kpis { flex: 2; margin: 0; padding: 0; border: 0; }
 .main .kpis p { border-left: 1px solid rgba(255, 255, 255, .18); }
+.main .hero > .kpis:first-child p:first-child { border-left: 0; }
 .main .kpis strong { margin-top: 4px; font-size: 20px; }
 .main .kpis span { font-size: 15px; }
 .main .banner { padding: 12px 12px 12px 20px; font-size: 16px; }
@@ -301,6 +303,16 @@ const paidSince = (customers, days, now = Date.now()) =>
 // The last three named items a customer bought, newest first.
 const recentItems = (customer) => customer.entries.filter((entry) => entry.n).slice(-3).reverse().map((entry) => entry.n).join(" · ");
 
+// A day as "2026-11-17", the format date boxes use, in local time.
+const isoDay = (t = Date.now()) => new Date(t).toLocaleDateString("en-CA");
+
+// "2026-11-03" from a date box -> midday that day. Must be a real date, from 2000 on, and not in the future.
+function parseDay(text, now = Date.now()) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+  const t = m && new Date(+m[1], m[2] - 1, +m[3], 12).getTime();
+  return m && new Date(t).getDate() === +m[3] && +m[1] >= 2000 && t - DAY / 2 <= now ? Math.min(t, now) : null;
+}
+
 const daysToMonthEnd = (now = new Date()) => new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate();
 
 // Payments settle the oldest sales first. Returns the age of the oldest unpaid sale.
@@ -368,6 +380,21 @@ function load() {
   return null;
 }
 
+// A backup file comes from outside the app, so every field is checked and capped, like a statement link.
+function checkBook(data) {
+  if (!data || typeof data.shop !== "string" || !Array.isArray(data.customers)) return null;
+  const ids = new Set();
+  const customers = data.customers.filter((c) => c && typeof c.name === "string" && c.name.trim() && Array.isArray(c.entries)).map((c) => {
+    const id = typeof c.id === "string" && c.id && !ids.has(c.id) ? c.id.slice(0, 40) : newId();
+    ids.add(id);
+    return { id, name: c.name.slice(0, 40), phone: typeof c.phone === "string" ? c.phone.slice(0, 20) : "", ...(c.sample === true && { sample: true }),
+      entries: c.entries.filter((e) => e && Number.isFinite(e.t) && Number.isInteger(e.c) && e.c !== 0)
+        .map((e) => ({ t: e.t, c: clampCents(e.c), ...(typeof e.n === "string" && e.n && { n: e.n.slice(0, 40) }) })) };
+  });
+  const prices = ITEMS.filter(([, name]) => Number.isInteger(data.prices?.[name]) && data.prices[name] > 0 && data.prices[name] <= MAX_CENTS);
+  return { shop: data.shop.slice(0, 40) || "My Spaza", customers, ...(prices.length && { prices: Object.fromEntries(prices.map(([, name]) => [name, data.prices[name]])) }) };
+}
+
 function save() {
   try {
     localStorage.setItem(STORE, JSON.stringify(book));
@@ -418,6 +445,8 @@ const ICONS = {
 
 // One-tap items. The prices are examples only: every shop sets its own, and any amount can be typed.
 const ITEMS = [["🍞", "Bread", 1800], ["🌽", "Maize meal", 4200], ["🥛", "Milk", 3400], ["📱", "Airtime", 2000], ["⚡", "Electricity", 5000], ["🛢️", "Cooking oil", 3800]];
+// The shop's own price for an item, or the example price until it sets one.
+const price = (name, cents) => book.prices?.[name] ?? cents;
 
 function icon(name, size = 24) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -490,6 +519,9 @@ function toast(text, undo) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { box.hidden = true; }, 7000);
 }
+
+// One of the small numbers in the green money card.
+const kpi = (iconName, value, label) => el("p", {}, icon(iconName, 20), el("strong", {}, value), el("span", {}, label));
 
 const dateText = (t) => new Date(t).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" });
 
@@ -579,18 +611,55 @@ function customerForm(customer) {
   openForm(customer ? "Change customer" : "Add a customer", [
     { id: "customer-name", label: "Name", value: customer?.name, attrs: { maxlength: 40 } },
     { id: "customer-phone", label: "WhatsApp number (optional)", value: customer?.phone, attrs: { inputmode: "tel", placeholder: "082 123 4567" } },
-  ], (name, phone) => {
+    // A new customer may already owe money in the paper book. Only asked when adding.
+    ...(customer ? [] : [
+      { id: "customer-owes", label: "Already owes you? (from your paper book)", attrs: { inputmode: "decimal", placeholder: "For example 300" } },
+      { id: "customer-since", label: "Owing since", value: isoDay(), attrs: { type: "date", max: isoDay() } }]),
+  ], (name, phone, owes, since) => {
     if (!name) return "Please type the customer's name.";
     if (phone && !waNumber(phone)) return "Use a South African cell number, like 082 123 4567.";
+    const opening = owes ? parseCents(owes) : 0;
+    if (opening === null) return "Type what they already owe in rands, for example 300.";
+    const t = opening && parseDay(since);
+    if (opening && !t) return "Pick the day they started owing. It cannot be in the future.";
     if (customer) Object.assign(customer, { name, phone, sample: false });
     else {
-      const added = { id: newId(), name, phone, entries: [] };
+      const added = { id: newId(), name, phone, entries: opening ? [{ t, c: opening, n: "From paper book" }] : [] };
       book.customers.push(added);
       mode = "sale";
       location.hash = "c=" + added.id;
     }
     save();
   });
+}
+
+function priceForm() {
+  openForm("Your prices", ITEMS.map(([emoji, name, cents], i) => ({ id: "price-" + i, label: `${emoji} ${name} (rands)`, value: String(price(name, cents) / 100), attrs: { inputmode: "decimal" } })), (...values) => {
+    const cents = values.map(parseCents);
+    const bad = cents.indexOf(null);
+    if (bad >= 0) return `Type a price for ${ITEMS[bad][1]}, for example 18.50`;
+    book.prices = Object.fromEntries(ITEMS.map(([, name], i) => [name, cents[i]]));
+    save();
+  });
+}
+
+function downloadBackup() {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(book)], { type: "application/json" }));
+  el("a", { href: url, download: `kasibook-backup-${isoDay()}.json` }).click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("Backup saved in your Downloads. Send it to yourself on WhatsApp to keep it safe.");
+}
+
+async function loadBackup(file) {
+  let loaded = null;
+  try { if (file.size < 5e6) loaded = checkBook(JSON.parse(await file.text())); } catch { /* not a JSON file: said below */ }
+  if (!loaded) return toast("That file is not a KasiBook backup.");
+  if (!confirm(`Replace the book on this device with the backup of ${loaded.shop} (${loaded.customers.length} customers)?`)) return;
+  const before = book;
+  book = loaded;
+  save();
+  render();
+  toast("Backup loaded", () => { book = before; save(); render(); });
 }
 
 function record(customer, cents, error, item) {
@@ -676,7 +745,7 @@ function homeScreen() {
   const followUp = [...owing].sort((a, b) => daysOwing(b) - daysOwing(a)).slice(0, 3);
   const left = daysToMonthEnd();
   const hour = new Date().getHours();
-  const kpi = (iconName, value, label) => el("p", {}, icon(iconName, 20), el("strong", {}, value), el("span", {}, label));
+  const file = el("input", { type: "file", accept: ".json,application/json", hidden: true, onchange: () => file.files[0] && loadBackup(file.files[0]) });
   const tile = (target, iconName, tone, title, text) =>
     el(typeof target === "string" ? "a" : "button", typeof target === "string" ? { class: "tile", href: target } : { class: "tile", onclick: target },
       el("span", { class: "bubble " + tone }, icon(iconName)),
@@ -714,6 +783,13 @@ function homeScreen() {
       el("div", { class: "section" }, el("h2", {}, "Follow up first"), el("a", { href: "#list" }, "See all")),
       el("ul", { class: "list compact" }, tableHead(), followUp.map((customer) => customerRow(customer)))],
     book.customers.length === 0 && emptyState("Your book is empty", "Start by adding your first customer. Then record what they buy on credit.", addButton("Add your first customer")),
+    el("section", { class: "card" },
+      el("h2", {}, "Keep a copy of your book"),
+      el("p", { class: "empty", style: "margin-bottom:14px" }, "Your book is saved only on this device. Download a backup now and then. On a new phone, load it to get your book back."),
+      el("div", { class: "pair" },
+        el("button", { class: "btn", onclick: downloadBackup }, "Download backup"),
+        el("button", { class: "btn", onclick: () => file.click() }, "Load backup")),
+      file),
     el("p", { class: "note", style: "margin-bottom:24px" }, "Saved on this device. Works with no data."));
 }
 
@@ -758,12 +834,19 @@ function listScreen(intent) {
 
 // Every sale and payment in the book, newest first.
 function transactionsScreen() {
-  const entries = book.customers.flatMap((customer) => customer.entries.map((entry) => ({ ...entry, customer }))).sort((a, b) => b.t - a.t).slice(0, 100);
+  const all = book.customers.flatMap((customer) => customer.entries.map((entry) => ({ ...entry, customer }))).sort((a, b) => b.t - a.t);
+  const entries = all.slice(0, 100);
+  const today = all.filter((entry) => entry.t >= new Date().setHours(0, 0, 0, 0));
+  const sum = (sign) => today.reduce((total, entry) => total + (Math.sign(entry.c) === sign ? Math.abs(entry.c) : 0), 0);
   return el("div", {},
     el("header", { class: "top" },
       el("a", { class: "back", href: "#" }, icon("left", 20), "Home"),
       el("h1", { tabindex: "-1" }, "Transactions"),
-      el("p", { class: "label", style: "margin-top:6px" }, "Every sale and payment, newest first.")),
+      el("p", { class: "label", style: "margin-top:6px" }, "Every sale and payment, newest first."),
+      el("div", { class: "hero" }, el("div", { class: "kpis" },
+        kpi("bag", rand(sum(1)), "sold on credit today"),
+        kpi("check", rand(sum(-1)), "paid back today"),
+        kpi("repeat", String(today.length), "entries today")))),
     entries.length
       ? el("section", { class: "card" }, el("ul", { class: "history" }, entries.map((entry) => el("li", {},
           el("span", {}, `${dateText(entry.t)} \u00b7 `, el("a", { href: "#c=" + entry.customer.id, style: "color:var(--green);font-weight:700" }, entry.customer.name), ` \u00b7 ${entry.c > 0 ? entry.n || "Bought on credit" : "Paid"}`),
@@ -798,10 +881,10 @@ function customerScreen(customer) {
     el("section", { class: "card" },
       el("div", { class: "tabs" }, tab("sale", "Sold on credit"), tab("paid", "Got paid", owed <= 0)),
       !paying && [
-        el("h2", {}, "What did they buy?"),
+        el("div", { class: "head" }, el("h2", {}, "What did they buy?"), el("button", { class: "link", onclick: priceForm }, "Change prices")),
         el("div", { class: "items" }, ITEMS.map(([emoji, name, cents]) =>
-          el("button", { class: "item", onclick: () => record(customer, cents, error, name) },
-            el("span", { "aria-hidden": "true" }, emoji), name, el("small", {}, "R" + cents / 100))))],
+          el("button", { class: "item", onclick: () => record(customer, price(name, cents), error, name) },
+            el("span", { "aria-hidden": "true" }, emoji), name, el("small", {}, rand(price(name, cents))))))],
       el("h2", {}, paying ? "How much did they pay?" : "Or tap an amount"),
       el("div", { class: "chips" }, [10, 20, 50, 100].map((rands) =>
         el("button", { class: "chip", onclick: () => record(customer, sign * rands * 100, error) }, (paying ? "R" : "+R") + rands))),
@@ -894,6 +977,9 @@ if (location.search === "?test") {
   console.assert(paidSince([sipho], 7, 12 * DAY) === 5000 && paidSince([sipho], 7, 30 * DAY) === 0, "paidSince");
   console.assert(recentItems({ entries: [{ c: 1, n: "Bread" }, { c: 1 }, { c: 1, n: "Milk" }] }) === "Milk · Bread", "recentItems");
   console.assert(daysToMonthEnd(new Date(2026, 10, 17)) === 13, "daysToMonthEnd");
+  console.assert(parseDay("2026-11-03", Date.parse("2026-11-17")) === new Date(2026, 10, 3, 12).getTime() && parseDay("2026-02-31") === null && parseDay("2999-01-01") === null && parseDay("") === null, "parseDay");
+  const restored = checkBook({ shop: "X", customers: [{ id: "a", name: "Sipho", entries: [{ t: 1, c: 5e12 }, { t: "bad", c: 1 }] }, { id: "a", name: "Lindi", entries: [] }, { name: 7 }], prices: { Bread: 2000, Milk: -1 } });
+  console.assert(checkBook({}) === null && restored.customers.length === 2 && restored.customers[0].entries.length === 1 && restored.customers[0].entries[0].c === MAX_CENTS && restored.customers[1].id !== "a" && restored.prices.Bread === 2000 && !("Milk" in restored.prices), "checkBook");
   console.log("KasiBook self-check finished");
 }
 </script>
