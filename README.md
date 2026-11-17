@@ -276,11 +276,11 @@ The customer pays at the counter. The owner taps **Got paid**, then an amount or
 ## 🪙 Tokens and Tools
 
 > [!NOTE]
-> **One person, one free account.** I worked alone, on a **free GitHub Copilot account**: no paid plan and no teammates' accounts to share the work. The free plan's monthly allowance is small, so my usage shows up as a **larger percentage** of that allowance than the same work would on a paid plan. I also used another AI coding assistant during the build, so the Copilot usage screenshot shows only part of my AI use.
+> **One person, one free account.** I worked alone, on a **free GitHub Copilot account**: no paid plan and no teammates' accounts to share the work. The free plan's monthly allowance is small, so my usage shows up as a **larger percentage** of that allowance than the same work would on a paid plan.
 
-<!-- Copilot /usage screenshot: save it as docs/token-usage.png, then delete the two arrows around the line below.
-![GitHub Copilot usage](docs/token-usage.png)
--->
+### GitHub Copilot Usage
+
+<img src="docs/token-usage.png" width="700" alt="GitHub Copilot usage: Copilot Free plan, 50% of monthly chat messages used">
 
 ### How I Kept Tokens Low
 1. **Plan first, build small.** The problem, features, screens and edge cases were written down before any code was requested. The design changed a few times during the build, but the finished app is four small files, about 65 KB in total.
