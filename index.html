@@ -22,7 +22,8 @@ h2 { font-size: 18px; margin-bottom: 12px; }
 h1, #toast { overflow-wrap: anywhere; }
 button, input { font: inherit; color: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.top :focus-visible, .side :focus-visible { outline-color: var(--gold); }
 .icon { flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* Green header shared by every screen */
@@ -67,10 +68,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 /* Home */
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px; }
-.tile { display: flex; align-items: center; gap: 10px; min-height: 72px; padding: 12px; border: 0; border-radius: 16px; background: #fff; box-shadow: var(--shadow); color: inherit; text-align: left; text-decoration: none; cursor: pointer; }
-.tile .bubble { width: 42px; height: 42px; margin: 0; border-radius: 13px; }
+.tile { display: flex; align-items: center; gap: 8px; min-height: 72px; padding: 10px; border: 0; border-radius: 16px; background: #fff; box-shadow: var(--shadow); color: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.tile .bubble { width: 36px; height: 36px; margin: 0; border-radius: 13px; }
 .tile > span:nth-child(2) { flex: 1; min-width: 0; }
-.tile strong { display: block; font-size: 15px; line-height: 1.25; }
+.tile strong { display: block; font-size: 14px; line-height: 1.25; }
 .tile > .icon { display: none; color: #9aa29c; }
 
 /* A customer in a list. On a phone it is a card; in desktop view the same parts line up as a table row. */
@@ -87,14 +88,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 /* Phone navigation, fixed to the bottom */
 .has-tabs { padding-bottom: 92px; }
-#app > .tabbar { position: fixed; left: 50%; bottom: 0; z-index: 4; flex: none; flex-direction: row; align-items: center; justify-content: space-around; width: min(100%, 480px); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(255, 255, 255, .95); transform: translateX(-50%); }
+#app > .tabbar { position: fixed; left: 50%; bottom: 0; z-index: 4; flex: none; flex-direction: row; align-items: center; justify-content: space-around; width: min(100%, 480px); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #fff; transform: translateX(-50%); }
 .tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 48px; color: var(--muted); font-size: 12px; font-weight: 600; text-decoration: none; }
 .tabbar a[aria-current="page"] { color: var(--green); }
 .plus { display: grid; place-items: center; width: 54px; height: 54px; margin-top: -20px; border: 4px solid #fff; border-radius: 50%; background: var(--green); color: #fff; box-shadow: 0 6px 16px rgba(8, 123, 77, .35); cursor: pointer; }
 
 .section { display: flex; justify-content: space-between; align-items: baseline; margin: 24px 20px 12px; }
 .section h2 { margin: 0; }
-.section a { color: var(--green); font-size: 16px; font-weight: 700; }
+.section a { margin: -10px 0; padding: 10px 0 10px 12px; color: var(--green); font-size: 16px; font-weight: 700; }
 .bubble { flex: none; display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 6px; border-radius: 15px; background: #e3f1e8; color: var(--green); }
 .bubble.gold { background: #fdf0c8; color: #7a5600; }
 .bubble.blue { background: #e1ecfb; color: #1d4f91; }
@@ -116,7 +117,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .search { position: relative; margin: 16px 16px 0; }
 .search .icon { position: absolute; left: 16px; top: 17px; color: var(--muted); }
 .search input { margin: 0; padding-left: 48px; border-color: transparent; box-shadow: var(--shadow); }
-.filters { display: flex; gap: 8px; margin: 12px 16px 0; padding-bottom: 2px; overflow-x: auto; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 16px 0; }
 .filter { flex: none; min-height: 40px; padding: 0 14px; border: 0; border-radius: 99px; background: #fff; box-shadow: var(--shadow); color: var(--muted); font-size: 15px; font-weight: 700; cursor: pointer; }
 .filter[aria-pressed="true"] { background: var(--green); color: #fff; }
 .act { display: inline-flex; align-items: center; gap: 6px; min-height: 42px; padding: 0 14px; border-radius: 99px; background: #eaf2ec; color: var(--green); font-size: 15px; font-weight: 700; text-decoration: none; white-space: nowrap; }
@@ -149,12 +150,13 @@ input:focus { border-color: var(--green); outline: 0; }
 .history { list-style: none; margin: 0; padding: 0; }
 .history li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; font-size: 16px; }
 .history strong { white-space: nowrap; }
+.history a { padding: 10px 0; }
 .history .paid { color: #187a4b; }
 .head { display: flex; justify-content: space-between; align-items: baseline; }
 
-#toast { position: fixed; left: 50%; bottom: 92px; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
+#toast { position: fixed; left: 50%; top: 12px; z-index: 5; display: flex; justify-content: space-between; align-items: center; gap: 12px; width: min(448px, calc(100vw - 32px)); padding: 10px 16px; border-radius: 15px; background: var(--ink); color: #fff; font-size: 16px; transform: translateX(-50%); box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
 #toast[hidden] { display: none; }
-#toast .link { color: var(--gold); }
+#toast .link { flex: none; color: var(--gold); }
 dialog { width: min(92vw, 440px); margin-top: 16px; padding: 22px; border: 0; border-radius: 22px; box-shadow: 0 30px 80px rgba(0, 0, 0, .35); }
 dialog::backdrop { background: rgba(10, 30, 20, .55); }
 
@@ -163,6 +165,8 @@ dialog::backdrop { background: rgba(10, 30, 20, .55); }
   body { padding: 24px 0; background: linear-gradient(160deg, #0f5132, #072a1a) fixed; }
   #app { min-height: calc(100vh - 48px); border-radius: 32px; box-shadow: 0 30px 80px rgba(0, 0, 0, .4); }
   .top { border-radius: 32px 32px 28px 28px; }
+  body:not(.wide) { padding-bottom: 0; }
+  body:not(.wide) #app { min-height: calc(100vh - 24px); border-radius: 32px 32px 0 0; }
 }
 /* Desktop view: offered on a laptop or office computer. A sidebar for getting around, the page beside it. */
 .ask { margin-bottom: 6px; font-size: 16px; font-weight: 600; }
@@ -170,7 +174,7 @@ body.wide { padding: 0; background: var(--bg); }
 .wide #app { max-width: none; min-height: 100vh; border-radius: 0; box-shadow: none; }
 .wide #app.shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: start; background: linear-gradient(90deg, var(--forest) 248px, var(--bg) 248px); }
 .wide #app > :not(.welcome):not(.side):not(.main) { align-self: center; width: 100%; max-width: 480px; }
-.wide #toast { bottom: 24px; }
+.wide #toast { top: auto; bottom: 24px; }
 
 .side { position: sticky; top: 0; height: 100vh; padding: 28px 16px 16px; background: var(--forest); color: #fff; }
 .side .brand { margin: 0 12px 32px; font-size: 22px; }
@@ -223,7 +227,13 @@ body.wide { padding: 0; background: var(--bg); }
 .split > .top, .split > .link { grid-column: 1 / -1; }
 .main.split > .link { justify-self: center; }
 .main.split > section:first-of-type { grid-row: 2 / span 2; }
-.main.split > .whatsapp { align-self: start; }
+.main.split > .whatsapp, .main.split > section:last-of-type { align-self: start; }
+@media (max-width: 1239px) {
+  .main .tiles { grid-template-columns: 1fr 1fr; }
+  .main .cust, .main .thead { grid-template-columns: 44px minmax(0, 1fr) 150px 96px; grid-template-areas: "av who status amt" ". acts acts acts"; }
+  .main .thead span:last-child { display: none; }
+  .main .acts { margin-top: 8px; }
+}
 
 .wide #app > .welcome { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; align-content: center; background: linear-gradient(90deg, var(--forest) 50%, var(--bg) 50%); }
 .wide .welcome .top { grid-column: 1; grid-row: 1; padding: 0 64px; border-radius: 0; background: none; text-align: left; }
@@ -433,8 +443,8 @@ function viewChoice() {
 // "Godwin's Spaza" -> "GS", for the round profile badge.
 const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => [...word][0]).join("").toUpperCase();
 
-// Which navigation entry matches the page on screen. A customer's page counts as Customers.
-const currentNav = (route) => (route.startsWith("c=") ? "#list" : "#" + route);
+// Which navigation entry matches the page on screen. A customer's page and the two "who?" pages count as Customers.
+const currentNav = (route) => (route.startsWith("c=") || route === "list=sale" || route === "list=paid" ? "#list" : "#" + route);
 
 // Desktop view: where you are and where you can go, always in the same place.
 function sidebar(route) {
@@ -679,9 +689,9 @@ function homeScreen() {
     el("div", { class: "section" }, el("h2", {}, "What would you like to do?")),
     el("nav", { class: "tiles", "aria-label": "Main actions" },
       tile("#list=sale", "bag", "", "Sold on credit", "Write a sale"),
-      tile("#list=paid", "check", "gold", "Got paid", "Record a payment"),
-      tile("#list", "users", "blue", "Who owes me", "See all customers"),
-      tile(() => customerForm(), "userPlus", "coral", "Add a customer", "New name in the book")),
+      tile("#list=paid", "check", "gold", "Got paid", "Record payment"),
+      tile("#list", "users", "blue", "Who owes me", "See customers"),
+      tile(() => customerForm(), "userPlus", "coral", "Add a customer", "New customer")),
     followUp.length > 0 && [
       el("div", { class: "section" }, el("h2", {}, "Follow up first"), el("a", { href: "#list" }, "See all")),
       el("ul", { class: "list compact" }, tableHead(), followUp.map((customer) => customerRow(customer)))],
