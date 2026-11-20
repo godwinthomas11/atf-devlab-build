@@ -15,7 +15,6 @@
 ![Sign-up](https://img.shields.io/badge/Sign--up-None-f4c542?style=for-the-badge)
 ![Cost](https://img.shields.io/badge/Cost-Free-25d366?style=for-the-badge)<br>
 ![Plain web](https://img.shields.io/badge/Built%20with-HTML%20%7C%20CSS%20%7C%20JavaScript-e34f26?style=for-the-badge)
-![GitHub Copilot](https://img.shields.io/badge/GitHub%20Copilot-Free%20plan-6e40c9?style=for-the-badge&logo=githubcopilot&logoColor=white)
 ![Event](https://img.shields.io/badge/Cape%20Code%20Hackathon-Africa%20Tech%20Festival%202026-c2410c?style=for-the-badge)
 
 ## 👉 [Open the live app](https://godwinthomas11.github.io/atf-devlab-build/) 👈
