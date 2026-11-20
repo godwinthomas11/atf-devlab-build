@@ -27,7 +27,7 @@
 
 | | |
 |---|---|
-| 👤 **Who** | **Godwin Thomas**, an international student studying Artificial Intelligence and Data Science at MIT-WPU, Pune, India. **A team of one.** |
+| 👤 **Who** | **Godwin Thomas**, an international student studying Artificial Intelligence and Data Science at MIT-WPU, Pune, India.|
 | 🏆 **Where** | **Cape Code Hackathon**, Africa Tech Festival, Cape Town, 17 November 2026 |
 | 🧩 **The problem** | South Africa's spaza shops lend to their neighbours every day, and the only record is a **paper notebook** that gets lost, disputed and never shared with the customer. |
 | 💡 **The solution** | A credit book on the owner's phone: **two taps** to record, **automatic** balances and ageing, and **WhatsApp reminders** that carry the customer's own statement. |
